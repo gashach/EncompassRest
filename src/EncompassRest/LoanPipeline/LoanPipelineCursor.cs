@@ -23,63 +23,61 @@ namespace EncompassRest.LoanPipeline
             Fields = fields ?? Array<string>.Empty;
         }
 
-        public Task<LoanPipelineData> GetItemAsync(int index) => GetItemAsync(index,null, CancellationToken.None);
+        public Task<LoanPipelineData> GetItemAsync(int index) => GetItemAsync(index, null, CancellationToken.None);
 
-        public Task<LoanPipelineData> GetItemAsync(int index, IEnumerable<string> ItemFields) => GetItemAsync(index, ItemFields, CancellationToken.None);
+        public Task<LoanPipelineData> GetItemAsync(int index, CancellationToken cancellationToken) => GetItemAsync(index, null, cancellationToken);
 
-        public async Task<LoanPipelineData> GetItemAsync(int index,IEnumerable<string> ItemFields, CancellationToken cancellationToken)
+        public Task<LoanPipelineData> GetItemAsync(int index, params string[] fields) => GetItemAsync(index, fields, CancellationToken.None);
+
+        public Task<LoanPipelineData> GetItemAsync(int index, IEnumerable<string> fields) => GetItemAsync(index, fields, CancellationToken.None);
+
+        public async Task<LoanPipelineData> GetItemAsync(int index, IEnumerable<string> fields, CancellationToken cancellationToken)
         {
             Preconditions.GreaterThanOrEquals(index, nameof(index), 0);
             Preconditions.LessThan(index, nameof(index), Count, nameof(Count));
 
-            var data = await GetItemsInternalAsync(index, 1,ItemFields, cancellationToken).ConfigureAwait(false);
+            var data = await GetItemsAsync(index, 1, fields, cancellationToken).ConfigureAwait(false);
             return data[0];
         }
 
-        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int count) => GetItemsAsync(start, count,null, CancellationToken.None);
+        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int? limit) => GetItemsAsync(start, limit, null, CancellationToken.None);
 
-        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int count, IEnumerable<string> ItemFields) => GetItemsAsync(start, count, ItemFields, CancellationToken.None);
+        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int? limit, CancellationToken cancellationToken) => GetItemsAsync(start, limit, null, cancellationToken);
 
-        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int count,IEnumerable<string> ItemFields, CancellationToken cancellationToken)
-        {
-            Preconditions.GreaterThanOrEquals(start, nameof(start), 0);
-            //Preconditions.LessThan(start, nameof(start), Count, nameof(Count));
-            Preconditions.GreaterThan(count, nameof(count), 0);
-            Preconditions.LessThanOrEquals(start, nameof(start) , Count, nameof(Count));
-            
+        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int? limit, params string[] fields) => GetItemsAsync(start, limit, fields, CancellationToken.None);
 
-            return GetItemsInternalAsync(start, count,ItemFields, cancellationToken);
-        }
+        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int? limit, IEnumerable<string> fields) => GetItemsAsync(start, limit, fields, CancellationToken.None);
 
-        private async Task<List<LoanPipelineData>> GetItemsInternalAsync(int start, int count, IEnumerable<string> ItemFields, CancellationToken cancellationToken)
-        {
-            var retrievedData = await Client.Pipeline.ViewPipelineCursorInternalAsync(CursorId, null, ItemFields == null?Fields:ItemFields, start, count, cancellationToken, nameof(GetItemAsync), async response =>
-            {
-                var list = await response.Content.ReadAsAsync<List<LoanPipelineData>>().ConfigureAwait(false);
-                if (list.Count == 0)
-                {
-                    throw await RestException.CreateAsync("Failed to retrieve pipeline data", response).ConfigureAwait(false);
-                }
-                return list;
-            }).ConfigureAwait(false);
-                
-            return retrievedData;
-        }
-
-        public Task<string> GetItemsRawAsync(int start, int? limit) => GetItemsRawAsync(start, limit, null,CancellationToken.None);
-        public Task<string> GetItemsRawAsync(int start, int? limit,IEnumerable<string> itemFields) => GetItemsRawAsync(start, limit, itemFields, CancellationToken.None);
-
-        public Task<string> GetItemsRawAsync(int start, int? limit, IEnumerable<string> itemFields,CancellationToken cancellationToken)
+        public Task<List<LoanPipelineData>> GetItemsAsync(int start, int? limit, IEnumerable<string> fields, CancellationToken cancellationToken)
         {
             Preconditions.GreaterThanOrEquals(start, nameof(start), 0);
             Preconditions.LessThan(start, nameof(start), Count, nameof(Count));
             if (limit.HasValue)
             {
                 Preconditions.GreaterThan(limit.GetValueOrDefault(), nameof(limit), 0);
-                Preconditions.LessThanOrEquals(start + limit.GetValueOrDefault(), $"{nameof(start)} + {nameof(limit)}", Count, nameof(Count));
             }
 
-            return Client.Pipeline.ViewPipelineCursorInternalAsync(CursorId, null, itemFields==null?Fields:itemFields, start, limit, cancellationToken, nameof(GetItemsRawAsync), response => response.Content.ReadAsStringAsync());
+            return Client.Pipeline.ViewPipelineCursorInternalAsync(CursorId, null, fields ?? Fields, start, limit, cancellationToken, nameof(GetItemAsync), response => response.Content.ReadAsAsync<List<LoanPipelineData>>());
+        }
+
+        public Task<string> GetItemsRawAsync(int start, int? limit) => GetItemsRawAsync(start, limit, null, CancellationToken.None);
+
+        public Task<string> GetItemsRawAsync(int start, int? limit, CancellationToken cancellationToken) => GetItemsRawAsync(start, limit, null, cancellationToken);
+
+        public Task<string> GetItemsRawAsync(int start, int? limit, params string[] fields) => GetItemsRawAsync(start, limit, fields, CancellationToken.None);
+
+        public Task<string> GetItemsRawAsync(int start, int? limit, IEnumerable<string> fields) => GetItemsRawAsync(start, limit, fields, CancellationToken.None);
+
+        public Task<string> GetItemsRawAsync(int start, int? limit, IEnumerable<string> fields, CancellationToken cancellationToken)
+        {
+            Preconditions.GreaterThanOrEquals(start, nameof(start), 0);
+            Preconditions.LessThan(start, nameof(start), Count, nameof(Count));
+            if (limit.HasValue)
+            {
+                Preconditions.GreaterThan(limit.GetValueOrDefault(), nameof(limit), 0);
+            }
+
+            return Client.Pipeline.ViewPipelineCursorInternalAsync(CursorId, null, fields ?? Fields, start, limit, cancellationToken, nameof(GetItemsRawAsync), response => response.Content.ReadAsStringAsync());
         }
     }
 }
