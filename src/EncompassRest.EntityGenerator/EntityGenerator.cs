@@ -6,14 +6,166 @@ using System.Text;
 using System.Threading.Tasks;
 using EncompassRest.Schema;
 using EncompassRest.Tests;
+using EnumsNET;
+using EnumsNET.NonGeneric;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest
 {
     public static class EntityGenerator
     {
+        static EntityGenerator()
+        {
+            var sharedEnumTypes = new[]
+            {
+                typeof(YOrN),
+                typeof(YNOrNA),
+                typeof(YesOrNo),
+                typeof(YesNoOrNA),
+                typeof(TrueOrFalse),
+                typeof(AcceptOrReject),
+                typeof(IncreasedOrDecreased),
+                typeof(UtilitiesDescription),
+                typeof(TermType),
+                typeof(SignedByTyp),
+                typeof(TotalClosingCostRemark),
+                typeof(PartyType),
+                typeof(AUS),
+                typeof(AUSRecommendation),
+                typeof(BankruptcyForeclosureStatus),
+                typeof(LicenseAuthType),
+                typeof(BorContingentLiabilitiesLiabilityDescription),
+                typeof(BorrowerType),
+                typeof(ClosingCostFundsType),
+                typeof(FundsTypeDescription),
+                typeof(ClosingCostSourceType),
+                typeof(SourceTypeDescription),
+                typeof(DocsLoanProgramType),
+                typeof(ServicingType),
+                typeof(CorrespondentOptionDesc),
+                typeof(CreditChargeType),
+                typeof(DenialReason),
+                typeof(DisclosureMethod),
+                typeof(DownPaymentSourceType),
+                typeof(YNOrOther),
+                typeof(Hud1EsPayToFeeType),
+                typeof(RefundableType),
+                typeof(RecSamePtyTypeDesc),
+                typeof(FeddieBorrowerAlienStatus),
+                typeof(FreddieDownPaymentType),
+                typeof(FullPrepaymentPenaltyOptionType),
+                typeof(ATRQMStatus),
+                typeof(ImpoundType),
+                typeof(ClosingCostImpoundType),
+                typeof(ImpoundWaived),
+                typeof(IncludeOriginationPointsCreditType),
+                typeof(InformationTypesWeCollect),
+                typeof(ProjectType),
+                typeof(MonthOrYear),
+                typeof(CanGoOrGoes),
+                typeof(OrgTyp),
+                typeof(IsOrIsNot),
+                typeof(LimitSharing),
+                typeof(ScsrsClaus),
+                typeof(CanIncreaseOrIncreases),
+                typeof(LoanAmountType),
+                typeof(LoanDocumentationType),
+                typeof(LoanPurposeType),
+                typeof(LoanType),
+                typeof(RefinancePurpose),
+                typeof(PropertyType),
+                typeof(LienType),
+                typeof(DoesOrDoesNot),
+                typeof(DoesOrDoesNot2),
+                typeof(OpenBankruptcy),
+                typeof(InterestRateImpactedStatus),
+                typeof(FeePaidBy),
+                typeof(Owner),
+                typeof(PaidBy),
+                typeof(PaidType),
+                typeof(PenaltyTerm),
+                typeof(OccupancyIntent),
+                typeof(PrepaymentPenaltyBasedOn),
+                typeof(PropertyUsageType),
+                typeof(PTB),
+                typeof(DaysInYear),
+                typeof(TypeOfPurchaser),
+                typeof(RiskClassification),
+                typeof(RoundingMethod),
+                typeof(SignatureType),
+                typeof(FinalSignatureType),
+                typeof(SofDBorrowerAddressType),
+                typeof(TimesToCollect),
+                typeof(TrstSamePtyTypDesc),
+                typeof(ProfitManagementItemType),
+                typeof(UCDPayoffType),
+                typeof(UlddBorrowerType),
+                typeof(VestingTrusteeOfType),
+                typeof(WholePocPaidByType),
+                typeof(AmortizationType),
+                typeof(ApplicationTakenMethodType),
+                typeof(OtherPropertyType),
+                typeof(RiskAssessmentType),
+                typeof(ActionTaken),
+                typeof(IndexMargin),
+                typeof(PropertyFormType)
+            };
+            s_sharedEnums = new Dictionary<string, HashSet<string>>();
+            foreach (var sharedEnumType in sharedEnumTypes)
+            {
+                s_sharedEnums.Add(sharedEnumType.Name, new HashSet<string>(NonGenericEnums.GetMembers(sharedEnumType).Select(m => m.AsString(EnumFormat.EnumMemberValue, EnumFormat.Name))));
+            }
+        }
+
+        private static readonly Dictionary<string, HashSet<string>> s_sharedEnums;
+
+        private static readonly HashSet<string> s_enumPropertyNamesToUseNotExactSharedEnum = new HashSet<string>
+        {
+            "AUS2",
+            "AUS3",
+            "AUS4",
+            "AUS5",
+            "AUSRecommendation2",
+            "AUSRecommendation3",
+            "AUSRecommendation4",
+            "AUSRecommendation5",
+            "DenialReason2",
+            "DenialReason3",
+            "DenialReason4",
+            "OriginationFeePaidBy",
+            "ServicingFeePaidBy",
+            "TransferFeePaidBy",
+            "YSPPaidBy",
+            "MIPremiumSourceType"
+        };
+
+        private static readonly HashSet<string> s_enumPropertyNamesToUseEntityTypeInName = new HashSet<string>
+        {
+            "PurposeOfLoan",
+            "LoanType",
+            "PropertyType",
+            "FeeType",
+            "RiskClass",
+            "LoanPurpose",
+            "BorrowerType",
+            "MortgageOriginator",
+            "AppraisalType"
+        };
+
+        private static readonly Dictionary<string, HashSet<string>> s_otherEnums = new Dictionary<string, HashSet<string>>();
+
+        private static readonly HashSet<string> s_propertiesToNotGenerate = new HashSet<string> { "Loan.ElliUCDFields", "Loan.VirtualFields" };
+
+        private static readonly HashSet<string> s_missingSchemaEntities = new HashSet<string> { "VirtualFields", "ElliUCDFields", "NonVols", "DocumentOrderLog" };
+
+        private static readonly Dictionary<string, HashSet<string>> s_enumOptionsToIgnore = new Dictionary<string, HashSet<string>>
+        {
+            { "LoanDocumentationType", new HashSet<string> { "NoIncomeon1003" } }
+        };
+
         public static void Main(string[] args)
         {
-            Console.ReadLine();
+            //Console.ReadLine();
 
             try
             {
@@ -28,38 +180,84 @@ namespace EncompassRest
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                Console.ReadLine();
             }
+            Console.Write("Press Enter to End.");
+            Console.ReadLine();
         }
 
         public static async Task GenerateClassFilesFromSchemaAsync(EncompassRestClient client, string destinationPath, string @namespace)
         {
             Directory.CreateDirectory(destinationPath);
-            var supportedEntities = await client.Loans.GetSupportedEntitiesAsync().ConfigureAwait(false);
+            var supportedEntities = new HashSet<string>((await client.Loans.GetSupportedEntitiesAsync().ConfigureAwait(false)).Select(e => e.Value))
+            {
+                "NonVol"
+            };
             var exceptions = new List<Exception>();
-            var knownBadEntities = new HashSet<string> { "LOCompensation", "VirtualFields", "ElliUCDFields", "NonVols" };
             foreach (var entity in supportedEntities)
             {
-                try
+                Exception exception;
+                var tryCount = 0;
+                do
                 {
-                    var loanSchema = await client.Schema.GetLoanSchemaAsync(true, entity).ConfigureAwait(false);
+                    exception = null;
+                    try
+                    {
+                        var loanSchema = await client.Schema.GetLoanSchemaAsync(true, new[] { entity }).ConfigureAwait(false);
 
-                    foreach (var pair in loanSchema.EntityTypes)
-                    {
-                        await GenerateClassFileFromSchemaAsync(destinationPath, @namespace, pair.Key, pair.Value).ConfigureAwait(false);
+                        if (loanSchema.EntityTypes.TryGetValue(entity, out var entitySchema))
+                        {
+                            await GenerateClassFileFromSchemaAsync(destinationPath, @namespace, entity, entitySchema).ConfigureAwait(false);
+                            if (s_missingSchemaEntities.Contains(entity))
+                            {
+                                Console.WriteLine($"Schema for {entity} can now be retrieved");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Failed to retrieve entity of type {entity}");
+                        }
+
                     }
-                    if (knownBadEntities.Contains(entity))
+                    catch (Exception ex)
                     {
-                        Console.WriteLine($"Schema for {entity} can now be retrieved");
+                        if (!s_missingSchemaEntities.Contains(entity))
+                        {
+                            exception = new Exception(entity, ex);
+                        }
                     }
-                }
-                catch (Exception ex)
+                    ++tryCount;
+                } while (exception != null && tryCount < 3);
+                if (exception != null)
                 {
-                    if (!knownBadEntities.Contains(entity))
+                    exceptions.Add(exception);
+                }
+            }
+            foreach (var enumPair in s_sharedEnums.Concat(s_otherEnums))
+            {
+                foreach (var innerEnumPair in s_otherEnums)
+                {
+                    if (enumPair.Key != innerEnumPair.Key && innerEnumPair.Value.IsSubsetOf(enumPair.Value))
                     {
-                        exceptions.Add(new Exception(entity, ex));
+                        if (innerEnumPair.Value.SetEquals(enumPair.Value))
+                        {
+                            Console.WriteLine($"{enumPair.Key} and {innerEnumPair.Key} are equal");
+                        }
+                        else
+                        {
+                            var diff = enumPair.Value.Except(innerEnumPair.Value).ToList();
+                            if (diff.Count <= 2)
+                            {
+                                Console.WriteLine($"{enumPair.Key} contains all members of {innerEnumPair.Key} but adds {string.Join(", ", diff)}");
+                            }
+                        }
                     }
                 }
+            }
+            var enumsPath = $"{destinationPath}\\Enums";
+            Directory.CreateDirectory(enumsPath);
+            foreach (var pair in s_sharedEnums.Concat(s_otherEnums))
+            {
+                await GenerateEnumFileFromOptions(enumsPath, $"{@namespace}.Enums", pair.Key, pair.Value).ConfigureAwait(false);
             }
             if (exceptions.Count > 0)
             {
@@ -71,15 +269,14 @@ namespace EncompassRest
         {
             var sb = new StringBuilder();
             sb.Append(
-$@"using System;
+$@"#pragma warning disable 1591
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using {@namespace}.Enums;
 
 namespace {@namespace}
 {{
-    public sealed partial class {entityType} : IDirty
+    public sealed partial class {entityType} : ExtensibleObject, IIdentifiable
     {{
 ");
 
@@ -88,41 +285,71 @@ namespace {@namespace}
             foreach (var pair in entitySchema.Properties.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
             {
                 var propertyName = pair.Key;
-                var propertySchema = pair.Value;
-                var propertyType = GetPropertyOrElementType(propertySchema, out var isEntity, out var isCollection);
-                var elementType = propertyType;
-                if (isCollection)
+                var entityPropertyName = $"{entityType}.{propertyName}";
+                if (!s_propertiesToNotGenerate.Contains(entityPropertyName))
                 {
-                    propertyType = $"DirtyList<{elementType}>";
-                }
-                var fieldName = $"_{char.ToLower(propertyName[0])}{propertyName.Substring(1)}";
-                sb.AppendLine($"        private {(isEntity || isCollection ? propertyType : $"DirtyValue<{propertyType}>")} {fieldName};");
-                properties.Add((propertyName, fieldName, isEntity, isCollection));
+                    var propertySchema = pair.Value;
+                    var propertyType = GetPropertyOrElementType(entityType, propertyName, propertySchema, out var isEntity, out var isCollection);
+                    var hasOptions = propertyType == "string" && propertySchema.AllowedValues?.Count > 0;
+                    if (hasOptions)
+                    {
+                        var optionValues = new HashSet<string>(propertySchema.AllowedValues.Select(o => o.Value).Where(v => !string.IsNullOrEmpty(v)));
+                        if (s_enumOptionsToIgnore.TryGetValue(propertyName, out var ignoredOptions))
+                        {
+                            optionValues.ExceptWith(ignoredOptions);
+                        }
+                        string enumName = null;
+                        foreach (var enumPair in s_sharedEnums)
+                        {
+                            if (s_enumPropertyNamesToUseNotExactSharedEnum.Contains(propertyName) ? optionValues.IsSubsetOf(enumPair.Value) : optionValues.SetEquals(enumPair.Value))
+                            {
+                                enumName = enumPair.Key;
+                                break;
+                            }
+                        }
+                        if (enumName == null)
+                        {
+                            enumName = GetEnumName(entityType, propertyName);
+                            if (s_otherEnums.TryGetValue(enumName, out var enumValues))
+                            {
+                                Console.WriteLine($"{entityType} Duplicate {enumName}: `{string.Join(", ", optionValues)}` - `{string.Join(", ", enumValues)}`");
+                            }
+                            else if (s_sharedEnums.TryGetValue(enumName, out enumValues))
+                            {
+                                Console.WriteLine($"{entityType} Shared Duplicate {enumName}: `{string.Join(", ", optionValues)}` - `{string.Join(", ", enumValues)}`");
+                            }
+                            else
+                            {
+                                s_otherEnums.Add(enumName, optionValues);
+                            }
+                        }
+                        propertyType = $"StringEnumValue<{enumName}>";
+                    }
+                    var elementType = propertyType;
+                    if (isCollection)
+                    {
+                        propertyType = $"DirtyList<{elementType}>";
+                    }
+                    var fieldName = $"_{char.ToLower(propertyName[0])}{propertyName.Substring(1)}";
+                    sb.AppendLine($"        private {(isEntity || isCollection ? propertyType : $"DirtyValue<{propertyType}>")} {fieldName};");
+                    properties.Add((propertyName, fieldName, isEntity, isCollection));
 
-                sb.AppendLine($"        public {(isCollection ? $"IList<{elementType}>" : propertyType)} {propertyName} {{ get {{ return {fieldName}{(isEntity || isCollection ? $" ?? ({fieldName} = new {propertyType}())" : string.Empty)}; }} set {{ {fieldName} = {(isCollection ? $"new {propertyType}(value)" : "value")}; }} }}");
+                    sb.AppendLine($"        public {(isCollection ? $"IList<{elementType}>" : propertyType)} {propertyName} {{ get => {fieldName}{(isEntity || isCollection ? $" ?? ({fieldName} = new {propertyType}())" : string.Empty)}; set => {fieldName} = {(isCollection ? $"new {propertyType}(value)" : "value")}; }}");
+                }
             }
 
             // Sorts non entity types first
             properties = properties.OrderBy(property => property.IsEntity || property.IsCollection).ToList();
 
-            // Must ensure no circular cleaning
             sb.Append(
-$@"        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+$@"        internal override bool DirtyInternal
         {{
             get
             {{
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = {string.Join($"{Environment.NewLine}                    || ", properties.Select(property => $"{property.FieldName}{(property.IsEntity || property.IsCollection ? "?.Dirty == true" : ".Dirty")}"))};
-                _gettingDirty = false;
-                return dirty;
+                return {string.Join($"{Environment.NewLine}                    || ", properties.Select(property => $"{property.FieldName}{(property.IsEntity || property.IsCollection ? "?.Dirty == true" : ".Dirty")}"))};
             }}
             set
             {{
-                if (_settingDirty) return;
-                _settingDirty = true;
                 {string.Join($"{Environment.NewLine}                ", properties.Select(property =>
                     {
                         var propertyName = property.FieldName;
@@ -132,10 +359,8 @@ $@"        private bool _gettingDirty;
                         }
                         return $"{propertyName}.Dirty = value;";
                     }))}
-                _settingDirty = false;
             }}
         }}
-        bool IDirty.Dirty {{ get {{ return Dirty; }} set {{ Dirty = value; }} }}
     }}
 }}");
             using (var sw = new StreamWriter(Path.Combine(destinationPath, entityType + ".cs")))
@@ -144,34 +369,138 @@ $@"        private bool _gettingDirty;
             }
         }
 
-        private static string GetPropertyOrElementType(PropertySchema propertySchema, out bool isEntity, out bool isCollection)
+        private static async Task GenerateEnumFileFromOptions(string destinationPath, string @namespace, string enumName, IEnumerable<string> options)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(
+$@"using System.Runtime.Serialization;
+
+namespace {@namespace}
+{{
+    public enum {enumName}
+    {{");
+
+            var enumMemberNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var existingEnumType = typeof(EncompassRestClient).Assembly.GetType($"{@namespace}.{enumName}");
+            var existingEnumValues = new HashSet<int>();
+            var optionsSet = new HashSet<string>(options);
+            var first = true;
+            if (existingEnumType != null)
+            {
+                foreach (var member in NonGenericEnums.GetMembers(existingEnumType))
+                {
+                    if (!first)
+                    {
+                        sb.AppendLine(",");
+                    }
+                    var enumMemberValue = member.AsString(EnumFormat.EnumMemberValue);
+                    if (enumMemberValue != null)
+                    {
+                        sb.AppendLine($@"        [EnumMember(Value = ""{enumMemberValue.Replace("\"", "\\\"")}"")]");
+                    }
+                    var name = member.Name;
+                    enumMemberNames.Add(name);
+                    optionsSet.Remove(enumMemberValue ?? name);
+                    var intValue = member.ToInt32();
+                    existingEnumValues.Add(intValue);
+                    sb.Append($"        {name} = {intValue}");
+                    first = false;
+                }
+            }
+            var i = 0;
+            foreach (var option in optionsSet)
+            {
+                while (existingEnumValues.Contains(i))
+                {
+                    ++i;
+                }
+                if (!first)
+                {
+                    sb.AppendLine(",");
+                }
+                var nameBuilder = new StringBuilder(option.Length);
+                var startWord = true;
+                for (var j = 0; j < option.Length; ++j)
+                {
+                    var c = option[j];
+                    if (j == 0 && char.IsDigit(c))
+                    {
+                        nameBuilder.Append('n');
+                    }
+                    if (!char.IsLetterOrDigit(c))
+                    {
+                        if (!startWord && c != '\'')
+                        {
+                            startWord = true;
+                        }
+                    }
+                    else
+                    {
+                        if (startWord)
+                        {
+                            c = char.ToUpper(c);
+                            startWord = false;
+                        }
+                        nameBuilder.Append(c);
+                    }
+                }
+                var name = nameBuilder.ToString();
+                if (name.Length > 0 && enumMemberNames.Add(name))
+                {
+                    if (name != option)
+                    {
+                        sb.AppendLine($@"        [EnumMember(Value = ""{option.Replace("\"", "\\\"")}"")]");
+                    }
+                    sb.Append($"        {name} = {i}");
+                    first = false;
+                    ++i;
+                }
+                else if (i > 0)
+                {
+                    sb.Length -= 1 + Environment.NewLine.Length;
+                }
+            }
+            sb.AppendLine();
+
+            sb.Append(
+@"    }
+}");
+            using (var sw = new StreamWriter(Path.Combine(destinationPath, enumName + ".cs")))
+            {
+                await sw.WriteAsync(sb.ToString()).ConfigureAwait(false);
+            }
+        }
+
+        private static string GetPropertyOrElementType(string entityType, string propertyName, PropertySchema propertySchema, out bool isEntity, out bool isCollection)
         {
             isEntity = false;
             isCollection = false;
             var propertyType = propertySchema.Type;
-            switch (propertyType)
+            switch (propertyType.EnumValue)
             {
-                case "string":
-                case "uuid":
+                case PropertySchemaType.String:
+                case PropertySchemaType.Uuid:
                     return "string";
-                case "decimal":
-                case "NA<decimal>":
-                case "bool":
-                case "int":
+                case PropertySchemaType.Decimal:
+                case PropertySchemaType.NADecimal:
+                case PropertySchemaType.Bool:
+                case PropertySchemaType.Int:
                     return $"{propertyType}?";
-                case "date":
-                case "datetime":
+                case PropertySchemaType.Date:
+                case PropertySchemaType.DateTime:
                     return "DateTime?";
-                case "set":
-                case "list":
+                case PropertySchemaType.Set:
+                case PropertySchemaType.List:
                     isCollection = true;
                     return propertySchema.ElementType;
-                case "entity":
+                case PropertySchemaType.Entity:
                     isEntity = true;
                     return propertySchema.EntityType;
                 default:
                     return $"PROBLEM<{propertyType}>";
             }
         }
+
+        private static string GetEnumName(string entityType, string propertyName) => s_enumPropertyNamesToUseEntityTypeInName.Contains(propertyName) ? $"{entityType}{propertyName}" : propertyName;
     }
 }

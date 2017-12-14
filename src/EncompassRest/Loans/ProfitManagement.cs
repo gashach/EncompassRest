@@ -1,48 +1,43 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class ProfitManagement : IDirty
+    public sealed partial class ProfitManagement : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _commissionableGrossProfit;
-        public decimal? CommissionableGrossProfit { get { return _commissionableGrossProfit; } set { _commissionableGrossProfit = value; } }
+        public decimal? CommissionableGrossProfit { get => _commissionableGrossProfit; set => _commissionableGrossProfit = value; }
         private DirtyValue<decimal?> _expenseAmount1;
-        public decimal? ExpenseAmount1 { get { return _expenseAmount1; } set { _expenseAmount1 = value; } }
+        public decimal? ExpenseAmount1 { get => _expenseAmount1; set => _expenseAmount1 = value; }
         private DirtyValue<decimal?> _expenseAmount2;
-        public decimal? ExpenseAmount2 { get { return _expenseAmount2; } set { _expenseAmount2 = value; } }
+        public decimal? ExpenseAmount2 { get => _expenseAmount2; set => _expenseAmount2 = value; }
         private DirtyValue<decimal?> _expenseAmount3;
-        public decimal? ExpenseAmount3 { get { return _expenseAmount3; } set { _expenseAmount3 = value; } }
+        public decimal? ExpenseAmount3 { get => _expenseAmount3; set => _expenseAmount3 = value; }
         private DirtyValue<decimal?> _expenseAmount4;
-        public decimal? ExpenseAmount4 { get { return _expenseAmount4; } set { _expenseAmount4 = value; } }
+        public decimal? ExpenseAmount4 { get => _expenseAmount4; set => _expenseAmount4 = value; }
         private DirtyValue<string> _expenseDescription1;
-        public string ExpenseDescription1 { get { return _expenseDescription1; } set { _expenseDescription1 = value; } }
+        public string ExpenseDescription1 { get => _expenseDescription1; set => _expenseDescription1 = value; }
         private DirtyValue<string> _expenseDescription2;
-        public string ExpenseDescription2 { get { return _expenseDescription2; } set { _expenseDescription2 = value; } }
+        public string ExpenseDescription2 { get => _expenseDescription2; set => _expenseDescription2 = value; }
         private DirtyValue<string> _expenseDescription3;
-        public string ExpenseDescription3 { get { return _expenseDescription3; } set { _expenseDescription3 = value; } }
+        public string ExpenseDescription3 { get => _expenseDescription3; set => _expenseDescription3 = value; }
         private DirtyValue<string> _expenseDescription4;
-        public string ExpenseDescription4 { get { return _expenseDescription4; } set { _expenseDescription4 = value; } }
+        public string ExpenseDescription4 { get => _expenseDescription4; set => _expenseDescription4 = value; }
         private DirtyValue<decimal?> _grossCheckAmount;
-        public decimal? GrossCheckAmount { get { return _grossCheckAmount; } set { _grossCheckAmount = value; } }
+        public decimal? GrossCheckAmount { get => _grossCheckAmount; set => _grossCheckAmount = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<decimal?> _netProfit;
-        public decimal? NetProfit { get { return _netProfit; } set { _netProfit = value; } }
+        public decimal? NetProfit { get => _netProfit; set => _netProfit = value; }
         private DirtyList<ProfitManagementItem> _profitManagementItems;
-        public IList<ProfitManagementItem> ProfitManagementItems { get { return _profitManagementItems ?? (_profitManagementItems = new DirtyList<ProfitManagementItem>()); } set { _profitManagementItems = new DirtyList<ProfitManagementItem>(value); } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public IList<ProfitManagementItem> ProfitManagementItems { get => _profitManagementItems ?? (_profitManagementItems = new DirtyList<ProfitManagementItem>()); set => _profitManagementItems = new DirtyList<ProfitManagementItem>(value); }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _commissionableGrossProfit.Dirty
+                return _commissionableGrossProfit.Dirty
                     || _expenseAmount1.Dirty
                     || _expenseAmount2.Dirty
                     || _expenseAmount3.Dirty
@@ -55,13 +50,9 @@ namespace EncompassRest.Loans
                     || _id.Dirty
                     || _netProfit.Dirty
                     || _profitManagementItems?.Dirty == true;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _commissionableGrossProfit.Dirty = value;
                 _expenseAmount1.Dirty = value;
                 _expenseAmount2.Dirty = value;
@@ -75,9 +66,7 @@ namespace EncompassRest.Loans
                 _id.Dirty = value;
                 _netProfit.Dirty = value;
                 if (_profitManagementItems != null) _profitManagementItems.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

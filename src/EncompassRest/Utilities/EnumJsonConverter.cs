@@ -2,62 +2,25 @@
 using EnumsNET;
 using EnumsNET.NonGeneric;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace EncompassRest.Utilities
 {
-    internal enum EnumOutput
-    {
-        Integer,
-        Name,
-        CamelCaseName,
-        EnumMemberValue
-    }
-
-    internal static class EnumOutputExtensions
-    {
-        public static EnumFormat GetEnumFormat(this EnumOutput value)
-        {
-            switch (value)
-            {
-                case EnumOutput.Name:
-                    return EnumFormat.Name;
-                case EnumOutput.CamelCaseName:
-                    return EnumJsonConverter.CamelCaseNameFormat;
-                case EnumOutput.EnumMemberValue:
-                    return EnumFormat.EnumMemberValue;
-                default:
-                    return EnumFormat.DecimalValue;
-            }
-        }
-    }
-
     internal sealed class EnumJsonConverter : JsonConverter
     {
-        internal static readonly EnumFormat CamelCaseNameFormat;
-        private static readonly CamelCaseNamingStrategy s_camelCaseNamingStrategy;
-
-        static EnumJsonConverter()
-        {
-            s_camelCaseNamingStrategy = new CamelCaseNamingStrategy();
-            CamelCaseNameFormat = Enums.RegisterCustomEnumFormat(member => s_camelCaseNamingStrategy.GetPropertyName(member.Name, false));
-        }
-
-        private readonly EnumFormat[] _enumFormats;
-
-        public EnumOutput EnumOutput { get; }
+        internal static readonly EnumFormat CamelCaseNameFormat = Enums.RegisterCustomEnumFormat(member => JsonHelper.CamelCaseNamingStrategy.GetPropertyName(member.Name, false));
+        
+        public EnumFormat EnumFormat { get; }
 
         public EnumJsonConverter()
-            : this(EnumOutput.Name)
+            : this(EnumFormat.Name)
         {
         }
 
-        public EnumJsonConverter(EnumOutput enumOutput)
+        public EnumJsonConverter(EnumFormat enumFormat)
         {
-            enumOutput.Validate(nameof(enumOutput));
+            enumFormat.Validate(nameof(enumFormat));
 
-            EnumOutput = enumOutput;
-            _enumFormats = new[] { enumOutput.GetEnumFormat() };
+            EnumFormat = enumFormat;
         }
 
         public override bool CanConvert(Type objectType)
@@ -79,7 +42,7 @@ namespace EncompassRest.Utilities
                         }
                         return null;
                     case JsonToken.String:
-                        return NonGenericEnums.Parse(objectType, (string)reader.Value, _enumFormats);
+                        return NonGenericEnums.Parse(objectType, (string)reader.Value, EnumFormat);
                     case JsonToken.Integer:
                         return NonGenericEnums.ToObject(objectType, reader.Value);
                     default:
@@ -101,12 +64,12 @@ namespace EncompassRest.Utilities
             else
             {
                 var enumType = value.GetType();
-                if (EnumOutput != EnumOutput.Integer)
+                if (EnumFormat != EnumFormat.DecimalValue)
                 {
                     var member = NonGenericEnums.GetMember(enumType, value);
                     if (member != null)
                     {
-                        writer.WriteValue(member.AsString(_enumFormats));
+                        writer.WriteValue(member.AsString(EnumFormat));
                         return;
                     }
                 }

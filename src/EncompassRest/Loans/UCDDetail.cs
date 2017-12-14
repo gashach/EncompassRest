@@ -1,46 +1,41 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class UCDDetail : IDirty
+    public sealed partial class UCDDetail : ExtensibleObject, IIdentifiable
     {
-        private DirtyValue<string> _feeAccountType;
-        public string FeeAccountType { get { return _feeAccountType; } set { _feeAccountType = value; } }
+        private DirtyValue<StringEnumValue<UCDPayoffType>> _feeAccountType;
+        public StringEnumValue<UCDPayoffType> FeeAccountType { get => _feeAccountType; set => _feeAccountType = value; }
         private DirtyValue<decimal?> _feeAmount;
-        public decimal? FeeAmount { get { return _feeAmount; } set { _feeAmount = value; } }
+        public decimal? FeeAmount { get => _feeAmount; set => _feeAmount = value; }
         private DirtyValue<DateTime?> _feeDateFrom;
-        public DateTime? FeeDateFrom { get { return _feeDateFrom; } set { _feeDateFrom = value; } }
+        public DateTime? FeeDateFrom { get => _feeDateFrom; set => _feeDateFrom = value; }
         private DirtyValue<DateTime?> _feeDateTo;
-        public DateTime? FeeDateTo { get { return _feeDateTo; } set { _feeDateTo = value; } }
+        public DateTime? FeeDateTo { get => _feeDateTo; set => _feeDateTo = value; }
         private DirtyValue<string> _feeDesc;
-        public string FeeDesc { get { return _feeDesc; } set { _feeDesc = value; } }
+        public string FeeDesc { get => _feeDesc; set => _feeDesc = value; }
         private DirtyValue<int?> _feeIndex;
-        public int? FeeIndex { get { return _feeIndex; } set { _feeIndex = value; } }
-        private DirtyValue<string> _feePaidBy;
-        public string FeePaidBy { get { return _feePaidBy; } set { _feePaidBy = value; } }
+        public int? FeeIndex { get => _feeIndex; set => _feeIndex = value; }
+        private DirtyValue<StringEnumValue<FeePaidBy>> _feePaidBy;
+        public StringEnumValue<FeePaidBy> FeePaidBy { get => _feePaidBy; set => _feePaidBy = value; }
         private DirtyValue<string> _feePaidTo;
-        public string FeePaidTo { get { return _feePaidTo; } set { _feePaidTo = value; } }
+        public string FeePaidTo { get => _feePaidTo; set => _feePaidTo = value; }
         private DirtyValue<bool?> _feePOC;
-        public bool? FeePOC { get { return _feePOC; } set { _feePOC = value; } }
+        public bool? FeePOC { get => _feePOC; set => _feePOC = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<int?> _lineNumber;
-        public int? LineNumber { get { return _lineNumber; } set { _lineNumber = value; } }
+        public int? LineNumber { get => _lineNumber; set => _lineNumber = value; }
         private DirtyValue<string> _section;
-        public string Section { get { return _section; } set { _section = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string Section { get => _section; set => _section = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _feeAccountType.Dirty
+                return _feeAccountType.Dirty
                     || _feeAmount.Dirty
                     || _feeDateFrom.Dirty
                     || _feeDateTo.Dirty
@@ -52,13 +47,9 @@ namespace EncompassRest.Loans
                     || _id.Dirty
                     || _lineNumber.Dirty
                     || _section.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _feeAccountType.Dirty = value;
                 _feeAmount.Dirty = value;
                 _feeDateFrom.Dirty = value;
@@ -71,9 +62,7 @@ namespace EncompassRest.Loans
                 _id.Dirty = value;
                 _lineNumber.Dirty = value;
                 _section.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

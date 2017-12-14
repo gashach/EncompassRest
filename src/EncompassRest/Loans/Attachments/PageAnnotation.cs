@@ -1,34 +1,33 @@
 ﻿using System;
+using EncompassRest.Utilities;
+using EnumsNET;
 
 namespace EncompassRest.Loans.Attachments
 {
-    public sealed class PageAnnotation : IDirty
+    public sealed class PageAnnotation : ExtensibleObject
     {
         private DirtyValue<DateTime?> _dateCreated;
-        public DateTime? DateCreated { get { return _dateCreated; } set { _dateCreated = value; } }
+        public DateTime? DateCreated { get => _dateCreated; set => _dateCreated = value; }
         private DirtyValue<string> _createdBy;
-        public string CreatedBy { get { return _createdBy; } set { _createdBy = value; } }
+        public string CreatedBy { get => _createdBy; set => _createdBy = value; }
         private DirtyValue<string> _text;
-        public string Text { get { return _text; } set { _text = value; } }
+        public string Text { get => _text; set => _text = value; }
         private DirtyValue<int?> _left;
-        public int? Left { get { return _left; } set { _left = value; } }
+        public int? Left { get => _left; set => _left = value; }
         private DirtyValue<int?> _top;
-        public int? Top { get { return _top; } set { _top = value; } }
+        public int? Top { get => _top; set => _top = value; }
         private DirtyValue<int?> _width;
-        public int? Width { get { return _width; } set { _width = value; } }
+        public int? Width { get => _width; set => _width = value; }
         private DirtyValue<int?> _height;
-        public int? Height { get { return _height; } set { _height = value; } }
+        public int? Height { get => _height; set => _height = value; }
         private DirtyValue<AnnotationVisibilityType?> _visibilityType;
-        public AnnotationVisibilityType? VisibilityType { get { return _visibilityType; } set { _visibilityType = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty;
-        internal bool Dirty
+        [EnumFormat(EnumFormat.DecimalValue)]
+        public AnnotationVisibilityType? VisibilityType { get => _visibilityType; set => _visibilityType = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _dateCreated.Dirty
+                return _dateCreated.Dirty
                     || _createdBy.Dirty
                     || _text.Dirty
                     || _left.Dirty
@@ -36,13 +35,9 @@ namespace EncompassRest.Loans.Attachments
                     || _width.Dirty
                     || _height.Dirty
                     || _visibilityType.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _dateCreated.Dirty = value;
                 _createdBy.Dirty = value;
                 _text.Dirty = value;
@@ -51,9 +46,7 @@ namespace EncompassRest.Loans.Attachments
                 _width.Dirty = value;
                 _height.Dirty = value;
                 _visibilityType.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

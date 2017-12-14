@@ -1,51 +1,40 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class Gfe2010WholePoc : IDirty
+    public sealed partial class Gfe2010WholePoc : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<int?> _gfe2010WholePocIndex;
-        public int? Gfe2010WholePocIndex { get { return _gfe2010WholePocIndex; } set { _gfe2010WholePocIndex = value; } }
+        public int? Gfe2010WholePocIndex { get => _gfe2010WholePocIndex; set => _gfe2010WholePocIndex = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<int?> _lineNumber;
-        public int? LineNumber { get { return _lineNumber; } set { _lineNumber = value; } }
+        public int? LineNumber { get => _lineNumber; set => _lineNumber = value; }
         private DirtyValue<decimal?> _wholePoc;
-        public decimal? WholePoc { get { return _wholePoc; } set { _wholePoc = value; } }
-        private DirtyValue<string> _wholePocPaidByType;
-        public string WholePocPaidByType { get { return _wholePocPaidByType; } set { _wholePocPaidByType = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public decimal? WholePoc { get => _wholePoc; set => _wholePoc = value; }
+        private DirtyValue<StringEnumValue<WholePocPaidByType>> _wholePocPaidByType;
+        public StringEnumValue<WholePocPaidByType> WholePocPaidByType { get => _wholePocPaidByType; set => _wholePocPaidByType = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _gfe2010WholePocIndex.Dirty
+                return _gfe2010WholePocIndex.Dirty
                     || _id.Dirty
                     || _lineNumber.Dirty
                     || _wholePoc.Dirty
                     || _wholePocPaidByType.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _gfe2010WholePocIndex.Dirty = value;
                 _id.Dirty = value;
                 _lineNumber.Dirty = value;
                 _wholePoc.Dirty = value;
                 _wholePocPaidByType.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

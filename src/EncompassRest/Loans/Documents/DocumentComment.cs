@@ -2,33 +2,31 @@
 
 namespace EncompassRest.Loans.Documents
 {
-    public sealed class DocumentComment : IDirty
+    public sealed class DocumentComment : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _comments;
-        public string Comments { get { return _comments; } set { _comments = value; } }
+        public string Comments { get => _comments; set => _comments = value; }
         private DirtyValue<int?> _forRoleId;
-        public int? ForRoleId { get { return _forRoleId; } set { _forRoleId = value; } }
-        private DirtyValue<Guid?> _commentId;
-        public Guid? CommentId { get { return _commentId; } set { _commentId = value; } }
+        public int? ForRoleId { get => _forRoleId; set => _forRoleId = value; }
+        private DirtyValue<string> _commentId;
+        public string CommentId { get => _commentId; set => _commentId = value; }
         private DirtyValue<DateTime?> _dateCreated;
-        public DateTime? DateCreated { get { return _dateCreated; } set { _dateCreated = value; } }
+        public DateTime? DateCreated { get => _dateCreated; set => _dateCreated = value; }
         private DirtyValue<string> _createdBy;
-        public string CreatedBy { get { return _createdBy; } set { _createdBy = value; } }
+        public string CreatedBy { get => _createdBy; set => _createdBy = value; }
         private DirtyValue<string> _createdByName;
-        public string CreatedByName { get { return _createdByName; } set { _createdByName = value; } }
+        public string CreatedByName { get => _createdByName; set => _createdByName = value; }
         private DirtyValue<DateTime?> _dateReviewed;
-        public DateTime? DateReviewed { get { return _dateReviewed; } set { _dateReviewed = value; } }
+        public DateTime? DateReviewed { get => _dateReviewed; set => _dateReviewed = value; }
         private DirtyValue<string> _reviewedBy;
-        public string ReviewedBy { get { return _reviewedBy; } set { _reviewedBy = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty;
-        internal bool Dirty
+        public string ReviewedBy { get => _reviewedBy; set => _reviewedBy = value; }
+        [IdPropertyName(nameof(CommentId))]
+        string IIdentifiable.Id { get => CommentId; set => CommentId = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _comments.Dirty
+                return _comments.Dirty
                     || _forRoleId.Dirty
                     || _commentId.Dirty
                     || _dateCreated.Dirty
@@ -36,13 +34,9 @@ namespace EncompassRest.Loans.Documents
                     || _createdByName.Dirty
                     || _dateReviewed.Dirty
                     || _reviewedBy.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _comments.Dirty = value;
                 _forRoleId.Dirty = value;
                 _commentId.Dirty = value;
@@ -51,9 +45,7 @@ namespace EncompassRest.Loans.Documents
                 _createdByName.Dirty = value;
                 _dateReviewed.Dirty = value;
                 _reviewedBy.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

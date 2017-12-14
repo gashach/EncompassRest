@@ -1,44 +1,39 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class MilestoneTaskContact : IDirty
+    public sealed partial class MilestoneTaskContact : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _address;
-        public string Address { get { return _address; } set { _address = value; } }
+        public string Address { get => _address; set => _address = value; }
         private DirtyValue<string> _city;
-        public string City { get { return _city; } set { _city = value; } }
+        public string City { get => _city; set => _city = value; }
         private DirtyValue<string> _contactId;
-        public string ContactId { get { return _contactId; } set { _contactId = value; } }
+        public string ContactId { get => _contactId; set => _contactId = value; }
         private DirtyValue<string> _email;
-        public string Email { get { return _email; } set { _email = value; } }
+        public string Email { get => _email; set => _email = value; }
         private DirtyValue<string> _guid;
-        public string Guid { get { return _guid; } set { _guid = value; } }
+        public string Guid { get => _guid; set => _guid = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<string> _name;
-        public string Name { get { return _name; } set { _name = value; } }
+        public string Name { get => _name; set => _name = value; }
         private DirtyValue<string> _phone;
-        public string Phone { get { return _phone; } set { _phone = value; } }
+        public string Phone { get => _phone; set => _phone = value; }
         private DirtyValue<string> _role;
-        public string Role { get { return _role; } set { _role = value; } }
+        public string Role { get => _role; set => _role = value; }
         private DirtyValue<string> _state;
-        public string State { get { return _state; } set { _state = value; } }
+        public string State { get => _state; set => _state = value; }
         private DirtyValue<string> _zip;
-        public string Zip { get { return _zip; } set { _zip = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string Zip { get => _zip; set => _zip = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _address.Dirty
+                return _address.Dirty
                     || _city.Dirty
                     || _contactId.Dirty
                     || _email.Dirty
@@ -49,13 +44,9 @@ namespace EncompassRest.Loans
                     || _role.Dirty
                     || _state.Dirty
                     || _zip.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _address.Dirty = value;
                 _city.Dirty = value;
                 _contactId.Dirty = value;
@@ -67,9 +58,7 @@ namespace EncompassRest.Loans
                 _role.Dirty = value;
                 _state.Dirty = value;
                 _zip.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

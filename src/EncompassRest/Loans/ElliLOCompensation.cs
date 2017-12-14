@@ -1,100 +1,95 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class ElliLOCompensation : IDirty
+    public sealed partial class ElliLOCompensation : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _adjustedPlanAdditonalAmountForBroker;
-        public decimal? AdjustedPlanAdditonalAmountForBroker { get { return _adjustedPlanAdditonalAmountForBroker; } set { _adjustedPlanAdditonalAmountForBroker = value; } }
+        public decimal? AdjustedPlanAdditonalAmountForBroker { get => _adjustedPlanAdditonalAmountForBroker; set => _adjustedPlanAdditonalAmountForBroker = value; }
         private DirtyValue<decimal?> _adjustedPlanAdditonalAmountForOfficer;
-        public decimal? AdjustedPlanAdditonalAmountForOfficer { get { return _adjustedPlanAdditonalAmountForOfficer; } set { _adjustedPlanAdditonalAmountForOfficer = value; } }
+        public decimal? AdjustedPlanAdditonalAmountForOfficer { get => _adjustedPlanAdditonalAmountForOfficer; set => _adjustedPlanAdditonalAmountForOfficer = value; }
         private DirtyValue<decimal?> _adjustedPlanAmountForBroker;
-        public decimal? AdjustedPlanAmountForBroker { get { return _adjustedPlanAmountForBroker; } set { _adjustedPlanAmountForBroker = value; } }
+        public decimal? AdjustedPlanAmountForBroker { get => _adjustedPlanAmountForBroker; set => _adjustedPlanAmountForBroker = value; }
         private DirtyValue<decimal?> _adjustedPlanAmountForOfficer;
-        public decimal? AdjustedPlanAmountForOfficer { get { return _adjustedPlanAmountForOfficer; } set { _adjustedPlanAmountForOfficer = value; } }
+        public decimal? AdjustedPlanAmountForOfficer { get => _adjustedPlanAmountForOfficer; set => _adjustedPlanAmountForOfficer = value; }
         private DirtyValue<decimal?> _adjustedPlanRateForBroker;
-        public decimal? AdjustedPlanRateForBroker { get { return _adjustedPlanRateForBroker; } set { _adjustedPlanRateForBroker = value; } }
+        public decimal? AdjustedPlanRateForBroker { get => _adjustedPlanRateForBroker; set => _adjustedPlanRateForBroker = value; }
         private DirtyValue<decimal?> _adjustedPlanRateForOfficer;
-        public decimal? AdjustedPlanRateForOfficer { get { return _adjustedPlanRateForOfficer; } set { _adjustedPlanRateForOfficer = value; } }
+        public decimal? AdjustedPlanRateForOfficer { get => _adjustedPlanRateForOfficer; set => _adjustedPlanRateForOfficer = value; }
         private DirtyValue<string> _adjustmentDescription;
-        public string AdjustmentDescription { get { return _adjustmentDescription; } set { _adjustmentDescription = value; } }
+        public string AdjustmentDescription { get => _adjustmentDescription; set => _adjustmentDescription = value; }
         private DirtyValue<string> _adjustmentDescriptionForOfficer;
-        public string AdjustmentDescriptionForOfficer { get { return _adjustmentDescriptionForOfficer; } set { _adjustmentDescriptionForOfficer = value; } }
+        public string AdjustmentDescriptionForOfficer { get => _adjustmentDescriptionForOfficer; set => _adjustmentDescriptionForOfficer = value; }
         private DirtyValue<decimal?> _basePlanAdditonalAmountForBroker;
-        public decimal? BasePlanAdditonalAmountForBroker { get { return _basePlanAdditonalAmountForBroker; } set { _basePlanAdditonalAmountForBroker = value; } }
+        public decimal? BasePlanAdditonalAmountForBroker { get => _basePlanAdditonalAmountForBroker; set => _basePlanAdditonalAmountForBroker = value; }
         private DirtyValue<decimal?> _basePlanAdditonalAmountForOfficer;
-        public decimal? BasePlanAdditonalAmountForOfficer { get { return _basePlanAdditonalAmountForOfficer; } set { _basePlanAdditonalAmountForOfficer = value; } }
+        public decimal? BasePlanAdditonalAmountForOfficer { get => _basePlanAdditonalAmountForOfficer; set => _basePlanAdditonalAmountForOfficer = value; }
         private DirtyValue<decimal?> _basePlanAmountForBroker;
-        public decimal? BasePlanAmountForBroker { get { return _basePlanAmountForBroker; } set { _basePlanAmountForBroker = value; } }
+        public decimal? BasePlanAmountForBroker { get => _basePlanAmountForBroker; set => _basePlanAmountForBroker = value; }
         private DirtyValue<decimal?> _basePlanAmountForOfficer;
-        public decimal? BasePlanAmountForOfficer { get { return _basePlanAmountForOfficer; } set { _basePlanAmountForOfficer = value; } }
+        public decimal? BasePlanAmountForOfficer { get => _basePlanAmountForOfficer; set => _basePlanAmountForOfficer = value; }
         private DirtyValue<decimal?> _basePlanMaximumAmountForBroker;
-        public decimal? BasePlanMaximumAmountForBroker { get { return _basePlanMaximumAmountForBroker; } set { _basePlanMaximumAmountForBroker = value; } }
+        public decimal? BasePlanMaximumAmountForBroker { get => _basePlanMaximumAmountForBroker; set => _basePlanMaximumAmountForBroker = value; }
         private DirtyValue<decimal?> _basePlanMaximumAmountForOfficer;
-        public decimal? BasePlanMaximumAmountForOfficer { get { return _basePlanMaximumAmountForOfficer; } set { _basePlanMaximumAmountForOfficer = value; } }
+        public decimal? BasePlanMaximumAmountForOfficer { get => _basePlanMaximumAmountForOfficer; set => _basePlanMaximumAmountForOfficer = value; }
         private DirtyValue<decimal?> _basePlanMinimumAmountForBroker;
-        public decimal? BasePlanMinimumAmountForBroker { get { return _basePlanMinimumAmountForBroker; } set { _basePlanMinimumAmountForBroker = value; } }
+        public decimal? BasePlanMinimumAmountForBroker { get => _basePlanMinimumAmountForBroker; set => _basePlanMinimumAmountForBroker = value; }
         private DirtyValue<decimal?> _basePlanMinimumAmountForOfficer;
-        public decimal? BasePlanMinimumAmountForOfficer { get { return _basePlanMinimumAmountForOfficer; } set { _basePlanMinimumAmountForOfficer = value; } }
+        public decimal? BasePlanMinimumAmountForOfficer { get => _basePlanMinimumAmountForOfficer; set => _basePlanMinimumAmountForOfficer = value; }
         private DirtyValue<decimal?> _basePlanRateForBroker;
-        public decimal? BasePlanRateForBroker { get { return _basePlanRateForBroker; } set { _basePlanRateForBroker = value; } }
+        public decimal? BasePlanRateForBroker { get => _basePlanRateForBroker; set => _basePlanRateForBroker = value; }
         private DirtyValue<decimal?> _basePlanRateForOfficer;
-        public decimal? BasePlanRateForOfficer { get { return _basePlanRateForOfficer; } set { _basePlanRateForOfficer = value; } }
+        public decimal? BasePlanRateForOfficer { get => _basePlanRateForOfficer; set => _basePlanRateForOfficer = value; }
         private DirtyValue<decimal?> _bonusCompAdditonalAmount;
-        public decimal? BonusCompAdditonalAmount { get { return _bonusCompAdditonalAmount; } set { _bonusCompAdditonalAmount = value; } }
+        public decimal? BonusCompAdditonalAmount { get => _bonusCompAdditonalAmount; set => _bonusCompAdditonalAmount = value; }
         private DirtyValue<decimal?> _bonusCompAmount;
-        public decimal? BonusCompAmount { get { return _bonusCompAmount; } set { _bonusCompAmount = value; } }
+        public decimal? BonusCompAmount { get => _bonusCompAmount; set => _bonusCompAmount = value; }
         private DirtyValue<decimal?> _bonusCompRate;
-        public decimal? BonusCompRate { get { return _bonusCompRate; } set { _bonusCompRate = value; } }
+        public decimal? BonusCompRate { get => _bonusCompRate; set => _bonusCompRate = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<DateTime?> _lastAppliedDate;
-        public DateTime? LastAppliedDate { get { return _lastAppliedDate; } set { _lastAppliedDate = value; } }
+        public DateTime? LastAppliedDate { get => _lastAppliedDate; set => _lastAppliedDate = value; }
         private DirtyValue<string> _lastAppliedDateTime;
-        public string LastAppliedDateTime { get { return _lastAppliedDateTime; } set { _lastAppliedDateTime = value; } }
-        private DirtyValue<string> _loanAmountType;
-        public string LoanAmountType { get { return _loanAmountType; } set { _loanAmountType = value; } }
-        private DirtyValue<string> _loanAmountTypeForOfficer;
-        public string LoanAmountTypeForOfficer { get { return _loanAmountTypeForOfficer; } set { _loanAmountTypeForOfficer = value; } }
+        public string LastAppliedDateTime { get => _lastAppliedDateTime; set => _lastAppliedDateTime = value; }
+        private DirtyValue<StringEnumValue<LoanAmountType>> _loanAmountType;
+        public StringEnumValue<LoanAmountType> LoanAmountType { get => _loanAmountType; set => _loanAmountType = value; }
+        private DirtyValue<StringEnumValue<LoanAmountType>> _loanAmountTypeForOfficer;
+        public StringEnumValue<LoanAmountType> LoanAmountTypeForOfficer { get => _loanAmountTypeForOfficer; set => _loanAmountTypeForOfficer = value; }
         private DirtyValue<string> _loanOriginatorID;
-        public string LoanOriginatorID { get { return _loanOriginatorID; } set { _loanOriginatorID = value; } }
+        public string LoanOriginatorID { get => _loanOriginatorID; set => _loanOriginatorID = value; }
         private DirtyValue<string> _loanOriginatorIDForOfficer;
-        public string LoanOriginatorIDForOfficer { get { return _loanOriginatorIDForOfficer; } set { _loanOriginatorIDForOfficer = value; } }
+        public string LoanOriginatorIDForOfficer { get => _loanOriginatorIDForOfficer; set => _loanOriginatorIDForOfficer = value; }
         private DirtyValue<string> _loanOriginatorName;
-        public string LoanOriginatorName { get { return _loanOriginatorName; } set { _loanOriginatorName = value; } }
+        public string LoanOriginatorName { get => _loanOriginatorName; set => _loanOriginatorName = value; }
         private DirtyValue<string> _loanOriginatorNameForOfficer;
-        public string LoanOriginatorNameForOfficer { get { return _loanOriginatorNameForOfficer; } set { _loanOriginatorNameForOfficer = value; } }
+        public string LoanOriginatorNameForOfficer { get => _loanOriginatorNameForOfficer; set => _loanOriginatorNameForOfficer = value; }
         private DirtyValue<decimal?> _netAdjustedAmountForBroker;
-        public decimal? NetAdjustedAmountForBroker { get { return _netAdjustedAmountForBroker; } set { _netAdjustedAmountForBroker = value; } }
+        public decimal? NetAdjustedAmountForBroker { get => _netAdjustedAmountForBroker; set => _netAdjustedAmountForBroker = value; }
         private DirtyValue<decimal?> _netAdjustedAmountForOfficer;
-        public decimal? NetAdjustedAmountForOfficer { get { return _netAdjustedAmountForOfficer; } set { _netAdjustedAmountForOfficer = value; } }
+        public decimal? NetAdjustedAmountForOfficer { get => _netAdjustedAmountForOfficer; set => _netAdjustedAmountForOfficer = value; }
         private DirtyValue<DateTime?> _planDate;
-        public DateTime? PlanDate { get { return _planDate; } set { _planDate = value; } }
+        public DateTime? PlanDate { get => _planDate; set => _planDate = value; }
         private DirtyValue<string> _planName;
-        public string PlanName { get { return _planName; } set { _planName = value; } }
+        public string PlanName { get => _planName; set => _planName = value; }
         private DirtyValue<string> _planNameForOfficer;
-        public string PlanNameForOfficer { get { return _planNameForOfficer; } set { _planNameForOfficer = value; } }
-        private DirtyValue<string> _roundingMethod;
-        public string RoundingMethod { get { return _roundingMethod; } set { _roundingMethod = value; } }
-        private DirtyValue<string> _roundingMethodForOfficer;
-        public string RoundingMethodForOfficer { get { return _roundingMethodForOfficer; } set { _roundingMethodForOfficer = value; } }
+        public string PlanNameForOfficer { get => _planNameForOfficer; set => _planNameForOfficer = value; }
+        private DirtyValue<StringEnumValue<RoundingMethod>> _roundingMethod;
+        public StringEnumValue<RoundingMethod> RoundingMethod { get => _roundingMethod; set => _roundingMethod = value; }
+        private DirtyValue<StringEnumValue<RoundingMethod>> _roundingMethodForOfficer;
+        public StringEnumValue<RoundingMethod> RoundingMethodForOfficer { get => _roundingMethodForOfficer; set => _roundingMethodForOfficer = value; }
         private DirtyValue<string> _triggerField;
-        public string TriggerField { get { return _triggerField; } set { _triggerField = value; } }
-        private DirtyValue<string> _whoPaidCompensation;
-        public string WhoPaidCompensation { get { return _whoPaidCompensation; } set { _whoPaidCompensation = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string TriggerField { get => _triggerField; set => _triggerField = value; }
+        private DirtyValue<StringEnumValue<WhoPaidCompensation>> _whoPaidCompensation;
+        public StringEnumValue<WhoPaidCompensation> WhoPaidCompensation { get => _whoPaidCompensation; set => _whoPaidCompensation = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _adjustedPlanAdditonalAmountForBroker.Dirty
+                return _adjustedPlanAdditonalAmountForBroker.Dirty
                     || _adjustedPlanAdditonalAmountForOfficer.Dirty
                     || _adjustedPlanAmountForBroker.Dirty
                     || _adjustedPlanAmountForOfficer.Dirty
@@ -133,13 +128,9 @@ namespace EncompassRest.Loans
                     || _roundingMethodForOfficer.Dirty
                     || _triggerField.Dirty
                     || _whoPaidCompensation.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _adjustedPlanAdditonalAmountForBroker.Dirty = value;
                 _adjustedPlanAdditonalAmountForOfficer.Dirty = value;
                 _adjustedPlanAmountForBroker.Dirty = value;
@@ -179,9 +170,7 @@ namespace EncompassRest.Loans
                 _roundingMethodForOfficer.Dirty = value;
                 _triggerField.Dirty = value;
                 _whoPaidCompensation.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

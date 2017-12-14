@@ -1,51 +1,40 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class PurchaseAdvicePayout : IDirty
+    public sealed partial class PurchaseAdvicePayout : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _amount;
-        public decimal? Amount { get { return _amount; } set { _amount = value; } }
+        public decimal? Amount { get => _amount; set => _amount = value; }
         private DirtyValue<string> _description;
-        public string Description { get { return _description; } set { _description = value; } }
+        public string Description { get => _description; set => _description = value; }
         private DirtyValue<decimal?> _diffAmount;
-        public decimal? DiffAmount { get { return _diffAmount; } set { _diffAmount = value; } }
+        public decimal? DiffAmount { get => _diffAmount; set => _diffAmount = value; }
         private DirtyValue<decimal?> _expectedAmount;
-        public decimal? ExpectedAmount { get { return _expectedAmount; } set { _expectedAmount = value; } }
+        public decimal? ExpectedAmount { get => _expectedAmount; set => _expectedAmount = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string Id { get => _id; set => _id = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _amount.Dirty
+                return _amount.Dirty
                     || _description.Dirty
                     || _diffAmount.Dirty
                     || _expectedAmount.Dirty
                     || _id.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _amount.Dirty = value;
                 _description.Dirty = value;
                 _diffAmount.Dirty = value;
                 _expectedAmount.Dirty = value;
                 _id.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

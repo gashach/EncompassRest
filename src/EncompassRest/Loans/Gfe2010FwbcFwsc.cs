@@ -1,55 +1,44 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class Gfe2010FwbcFwsc : IDirty
+    public sealed partial class Gfe2010FwbcFwsc : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _fwbc;
-        public string Fwbc { get { return _fwbc; } set { _fwbc = value; } }
+        public string Fwbc { get => _fwbc; set => _fwbc = value; }
         private DirtyValue<string> _fwsc;
-        public string Fwsc { get { return _fwsc; } set { _fwsc = value; } }
+        public string Fwsc { get => _fwsc; set => _fwsc = value; }
         private DirtyValue<int?> _gfe2010FwbcFwscIndex;
-        public int? Gfe2010FwbcFwscIndex { get { return _gfe2010FwbcFwscIndex; } set { _gfe2010FwbcFwscIndex = value; } }
+        public int? Gfe2010FwbcFwscIndex { get => _gfe2010FwbcFwscIndex; set => _gfe2010FwbcFwscIndex = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<string> _lineLetter;
-        public string LineLetter { get { return _lineLetter; } set { _lineLetter = value; } }
+        public string LineLetter { get => _lineLetter; set => _lineLetter = value; }
         private DirtyValue<int?> _lineNumber;
-        public int? LineNumber { get { return _lineNumber; } set { _lineNumber = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public int? LineNumber { get => _lineNumber; set => _lineNumber = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _fwbc.Dirty
+                return _fwbc.Dirty
                     || _fwsc.Dirty
                     || _gfe2010FwbcFwscIndex.Dirty
                     || _id.Dirty
                     || _lineLetter.Dirty
                     || _lineNumber.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _fwbc.Dirty = value;
                 _fwsc.Dirty = value;
                 _gfe2010FwbcFwscIndex.Dirty = value;
                 _id.Dirty = value;
                 _lineLetter.Dirty = value;
                 _lineNumber.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

@@ -1,51 +1,40 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class TQLComplianceAlert : IDirty
+    public sealed partial class TQLComplianceAlert : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<string> _lastComplianceOrderAlertCategories;
-        public string LastComplianceOrderAlertCategories { get { return _lastComplianceOrderAlertCategories; } set { _lastComplianceOrderAlertCategories = value; } }
+        public string LastComplianceOrderAlertCategories { get => _lastComplianceOrderAlertCategories; set => _lastComplianceOrderAlertCategories = value; }
         private DirtyValue<string> _lastComplianceOrderAlertMessage;
-        public string LastComplianceOrderAlertMessage { get { return _lastComplianceOrderAlertMessage; } set { _lastComplianceOrderAlertMessage = value; } }
+        public string LastComplianceOrderAlertMessage { get => _lastComplianceOrderAlertMessage; set => _lastComplianceOrderAlertMessage = value; }
         private DirtyValue<string> _lastComplianceOrderDescriptionOfAlerts;
-        public string LastComplianceOrderDescriptionOfAlerts { get { return _lastComplianceOrderDescriptionOfAlerts; } set { _lastComplianceOrderDescriptionOfAlerts = value; } }
+        public string LastComplianceOrderDescriptionOfAlerts { get => _lastComplianceOrderDescriptionOfAlerts; set => _lastComplianceOrderDescriptionOfAlerts = value; }
         private DirtyValue<int?> _tQLComplianceAlertIndex;
-        public int? TQLComplianceAlertIndex { get { return _tQLComplianceAlertIndex; } set { _tQLComplianceAlertIndex = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public int? TQLComplianceAlertIndex { get => _tQLComplianceAlertIndex; set => _tQLComplianceAlertIndex = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _id.Dirty
+                return _id.Dirty
                     || _lastComplianceOrderAlertCategories.Dirty
                     || _lastComplianceOrderAlertMessage.Dirty
                     || _lastComplianceOrderDescriptionOfAlerts.Dirty
                     || _tQLComplianceAlertIndex.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _id.Dirty = value;
                 _lastComplianceOrderAlertCategories.Dirty = value;
                 _lastComplianceOrderAlertMessage.Dirty = value;
                 _lastComplianceOrderDescriptionOfAlerts.Dirty = value;
                 _tQLComplianceAlertIndex.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

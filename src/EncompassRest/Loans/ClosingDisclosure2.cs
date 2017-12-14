@@ -1,72 +1,67 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class ClosingDisclosure2 : IDirty
+    public sealed partial class ClosingDisclosure2 : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _borrowerClosingCostAtClosing;
-        public decimal? BorrowerClosingCostAtClosing { get { return _borrowerClosingCostAtClosing; } set { _borrowerClosingCostAtClosing = value; } }
+        public decimal? BorrowerClosingCostAtClosing { get => _borrowerClosingCostAtClosing; set => _borrowerClosingCostAtClosing = value; }
         private DirtyValue<decimal?> _borrowerClosingCostBeforeClosing;
-        public decimal? BorrowerClosingCostBeforeClosing { get { return _borrowerClosingCostBeforeClosing; } set { _borrowerClosingCostBeforeClosing = value; } }
+        public decimal? BorrowerClosingCostBeforeClosing { get => _borrowerClosingCostBeforeClosing; set => _borrowerClosingCostBeforeClosing = value; }
         private DirtyValue<decimal?> _closingCostLenderCredits;
-        public decimal? ClosingCostLenderCredits { get { return _closingCostLenderCredits; } set { _closingCostLenderCredits = value; } }
+        public decimal? ClosingCostLenderCredits { get => _closingCostLenderCredits; set => _closingCostLenderCredits = value; }
         private DirtyValue<decimal?> _closingCostPaidByOthers;
-        public decimal? ClosingCostPaidByOthers { get { return _closingCostPaidByOthers; } set { _closingCostPaidByOthers = value; } }
+        public decimal? ClosingCostPaidByOthers { get => _closingCostPaidByOthers; set => _closingCostPaidByOthers = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<decimal?> _initialEscrowSubTotal;
-        public decimal? InitialEscrowSubTotal { get { return _initialEscrowSubTotal; } set { _initialEscrowSubTotal = value; } }
+        public decimal? InitialEscrowSubTotal { get => _initialEscrowSubTotal; set => _initialEscrowSubTotal = value; }
         private DirtyValue<decimal?> _lastDisclosedLenderCredits;
-        public decimal? LastDisclosedLenderCredits { get { return _lastDisclosedLenderCredits; } set { _lastDisclosedLenderCredits = value; } }
+        public decimal? LastDisclosedLenderCredits { get => _lastDisclosedLenderCredits; set => _lastDisclosedLenderCredits = value; }
         private DirtyValue<decimal?> _lastDisclosedLoanCosts;
-        public decimal? LastDisclosedLoanCosts { get { return _lastDisclosedLoanCosts; } set { _lastDisclosedLoanCosts = value; } }
+        public decimal? LastDisclosedLoanCosts { get => _lastDisclosedLoanCosts; set => _lastDisclosedLoanCosts = value; }
         private DirtyValue<decimal?> _lastDisclosedOtherCosts;
-        public decimal? LastDisclosedOtherCosts { get { return _lastDisclosedOtherCosts; } set { _lastDisclosedOtherCosts = value; } }
+        public decimal? LastDisclosedOtherCosts { get => _lastDisclosedOtherCosts; set => _lastDisclosedOtherCosts = value; }
         private DirtyValue<decimal?> _lCAtClosing;
-        public decimal? LCAtClosing { get { return _lCAtClosing; } set { _lCAtClosing = value; } }
+        public decimal? LCAtClosing { get => _lCAtClosing; set => _lCAtClosing = value; }
         private DirtyValue<decimal?> _originationChargesSubTotal;
-        public decimal? OriginationChargesSubTotal { get { return _originationChargesSubTotal; } set { _originationChargesSubTotal = value; } }
+        public decimal? OriginationChargesSubTotal { get => _originationChargesSubTotal; set => _originationChargesSubTotal = value; }
         private DirtyValue<decimal?> _otherSubTotal;
-        public decimal? OtherSubTotal { get { return _otherSubTotal; } set { _otherSubTotal = value; } }
+        public decimal? OtherSubTotal { get => _otherSubTotal; set => _otherSubTotal = value; }
         private DirtyValue<decimal?> _prepaidsSubTotal;
-        public decimal? PrepaidsSubTotal { get { return _prepaidsSubTotal; } set { _prepaidsSubTotal = value; } }
+        public decimal? PrepaidsSubTotal { get => _prepaidsSubTotal; set => _prepaidsSubTotal = value; }
         private DirtyValue<decimal?> _sellerClosingCostAtClosing;
-        public decimal? SellerClosingCostAtClosing { get { return _sellerClosingCostAtClosing; } set { _sellerClosingCostAtClosing = value; } }
+        public decimal? SellerClosingCostAtClosing { get => _sellerClosingCostAtClosing; set => _sellerClosingCostAtClosing = value; }
         private DirtyValue<decimal?> _sellerClosingCostBeforeClosing;
-        public decimal? SellerClosingCostBeforeClosing { get { return _sellerClosingCostBeforeClosing; } set { _sellerClosingCostBeforeClosing = value; } }
+        public decimal? SellerClosingCostBeforeClosing { get => _sellerClosingCostBeforeClosing; set => _sellerClosingCostBeforeClosing = value; }
         private DirtyValue<decimal?> _servicesDidNotShopSubTotal;
-        public decimal? ServicesDidNotShopSubTotal { get { return _servicesDidNotShopSubTotal; } set { _servicesDidNotShopSubTotal = value; } }
+        public decimal? ServicesDidNotShopSubTotal { get => _servicesDidNotShopSubTotal; set => _servicesDidNotShopSubTotal = value; }
         private DirtyValue<decimal?> _servicesDidShopSubTotal;
-        public decimal? ServicesDidShopSubTotal { get { return _servicesDidShopSubTotal; } set { _servicesDidShopSubTotal = value; } }
+        public decimal? ServicesDidShopSubTotal { get => _servicesDidShopSubTotal; set => _servicesDidShopSubTotal = value; }
         private DirtyValue<decimal?> _taxesGovermentFeesSubTotal;
-        public decimal? TaxesGovermentFeesSubTotal { get { return _taxesGovermentFeesSubTotal; } set { _taxesGovermentFeesSubTotal = value; } }
+        public decimal? TaxesGovermentFeesSubTotal { get => _taxesGovermentFeesSubTotal; set => _taxesGovermentFeesSubTotal = value; }
         private DirtyValue<decimal?> _totalBorrowerPaidAtClosing;
-        public decimal? TotalBorrowerPaidAtClosing { get { return _totalBorrowerPaidAtClosing; } set { _totalBorrowerPaidAtClosing = value; } }
+        public decimal? TotalBorrowerPaidAtClosing { get => _totalBorrowerPaidAtClosing; set => _totalBorrowerPaidAtClosing = value; }
         private DirtyValue<decimal?> _totalBorrowerPaidBeforeClosing;
-        public decimal? TotalBorrowerPaidBeforeClosing { get { return _totalBorrowerPaidBeforeClosing; } set { _totalBorrowerPaidBeforeClosing = value; } }
+        public decimal? TotalBorrowerPaidBeforeClosing { get => _totalBorrowerPaidBeforeClosing; set => _totalBorrowerPaidBeforeClosing = value; }
         private DirtyValue<decimal?> _totalClosingCost;
-        public decimal? TotalClosingCost { get { return _totalClosingCost; } set { _totalClosingCost = value; } }
+        public decimal? TotalClosingCost { get => _totalClosingCost; set => _totalClosingCost = value; }
         private DirtyValue<decimal?> _totalLoanCost;
-        public decimal? TotalLoanCost { get { return _totalLoanCost; } set { _totalLoanCost = value; } }
+        public decimal? TotalLoanCost { get => _totalLoanCost; set => _totalLoanCost = value; }
         private DirtyValue<decimal?> _totalOtherCost;
-        public decimal? TotalOtherCost { get { return _totalOtherCost; } set { _totalOtherCost = value; } }
+        public decimal? TotalOtherCost { get => _totalOtherCost; set => _totalOtherCost = value; }
         private DirtyValue<decimal?> _totalOtherCostAtClosing;
-        public decimal? TotalOtherCostAtClosing { get { return _totalOtherCostAtClosing; } set { _totalOtherCostAtClosing = value; } }
+        public decimal? TotalOtherCostAtClosing { get => _totalOtherCostAtClosing; set => _totalOtherCostAtClosing = value; }
         private DirtyValue<decimal?> _totalOtherCostBeforeClosing;
-        public decimal? TotalOtherCostBeforeClosing { get { return _totalOtherCostBeforeClosing; } set { _totalOtherCostBeforeClosing = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public decimal? TotalOtherCostBeforeClosing { get => _totalOtherCostBeforeClosing; set => _totalOtherCostBeforeClosing = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _borrowerClosingCostAtClosing.Dirty
+                return _borrowerClosingCostAtClosing.Dirty
                     || _borrowerClosingCostBeforeClosing.Dirty
                     || _closingCostLenderCredits.Dirty
                     || _closingCostPaidByOthers.Dirty
@@ -91,13 +86,9 @@ namespace EncompassRest.Loans
                     || _totalOtherCost.Dirty
                     || _totalOtherCostAtClosing.Dirty
                     || _totalOtherCostBeforeClosing.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _borrowerClosingCostAtClosing.Dirty = value;
                 _borrowerClosingCostBeforeClosing.Dirty = value;
                 _closingCostLenderCredits.Dirty = value;
@@ -123,9 +114,7 @@ namespace EncompassRest.Loans
                 _totalOtherCost.Dirty = value;
                 _totalOtherCostAtClosing.Dirty = value;
                 _totalOtherCostBeforeClosing.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

@@ -8,14 +8,14 @@ using EncompassRest.LoanBatch;
 using EncompassRest.LoanPipeline;
 using EncompassRest.Token;
 using EncompassRest.Utilities;
+using EncompassRest.Contacts;
+using EncompassRest.CustomDataObjects;
 
 namespace EncompassRest
 {
     public sealed class EncompassRestClient : IDisposable
     {
-        public static Task<EncompassRestClient> CreateFromUserCredentialsAsync(string clientId, string clientSecret, string instanceId, string userId, string password, TokenExpirationHandling tokenExpirationHandling = TokenExpirationHandling.Default) => CreateFromUserCredentialsAsync(clientId, clientSecret, instanceId, userId, password, tokenExpirationHandling, CancellationToken.None);
-
-        public static async Task<EncompassRestClient> CreateFromUserCredentialsAsync(string clientId, string clientSecret, string instanceId, string userId, string password, TokenExpirationHandling tokenExpirationHandling, CancellationToken cancellationToken)
+        public static async Task<EncompassRestClient> CreateFromUserCredentialsAsync(string clientId, string clientSecret, string instanceId, string userId, string password, TokenExpirationHandling tokenExpirationHandling, CancellationToken cancellationToken = default)
         {
             Preconditions.NotNullOrEmpty(clientId, nameof(clientId));
             Preconditions.NotNullOrEmpty(clientSecret, nameof(clientSecret));
@@ -28,9 +28,7 @@ namespace EncompassRest
             return client;
         }
 
-        public static Task<EncompassRestClient> CreateFromAuthorizationCodeAsync(string clientId, string clientSecret, string redirectUri, string authorizationCode) => CreateFromAuthorizationCodeAsync(clientId, clientSecret, redirectUri, authorizationCode, CancellationToken.None);
-
-        public static async Task<EncompassRestClient> CreateFromAuthorizationCodeAsync(string clientId, string clientSecret, string redirectUri, string authorizationCode, CancellationToken cancellationToken)
+        public static async Task<EncompassRestClient> CreateFromAuthorizationCodeAsync(string clientId, string clientSecret, string redirectUri, string authorizationCode, CancellationToken cancellationToken = default)
         {
             Preconditions.NotNullOrEmpty(clientId, nameof(clientId));
             Preconditions.NotNullOrEmpty(clientSecret, nameof(clientSecret));
@@ -65,6 +63,12 @@ namespace EncompassRest
         private Webhook.Webhook _webhook;
         private Pipeline _pipeline;
         private BatchUpdate _batchUpdate;
+        private BorrowerContacts _borrowerContacts;
+        private BusinessContacts _businessContacts;
+        private ResourceLocks.ResourceLocks _resourceLocks;
+        private GlobalCustomDataObjects _globalCustomDataObjects;
+        private Users.Users _users;
+        private LoanFolders.LoanFolders _loanFolders;
 
         #region Properties
         public AccessToken AccessToken { get; }
@@ -73,10 +77,7 @@ namespace EncompassRest
 
         public TimeSpan Timeout
         {
-            get
-            {
-                return HttpClient.Timeout;
-            }
+            get => HttpClient.Timeout;
             set
             {
                 HttpClient.Timeout = value;
@@ -88,8 +89,8 @@ namespace EncompassRest
         {
             get
             {
-                Loans.Loans loans;
-                return _loans ?? Interlocked.CompareExchange(ref _loans, (loans = new Loans.Loans(this)), null) ?? loans;
+                var loans = _loans;
+                return loans ?? Interlocked.CompareExchange(ref _loans, (loans = new Loans.Loans(this)), null) ?? loans;
             }
         }
 
@@ -97,8 +98,8 @@ namespace EncompassRest
         {
             get
             {
-                Schema.Schema schema;
-                return _schema ?? Interlocked.CompareExchange(ref _schema, (schema = new Schema.Schema(this)), null) ?? schema;
+                var schema = _schema;
+                return schema ?? Interlocked.CompareExchange(ref _schema, (schema = new Schema.Schema(this)), null) ?? schema;
             }
         }
 
@@ -106,8 +107,8 @@ namespace EncompassRest
         {
             get
             {
-                Webhook.Webhook webhook;
-                return _webhook ?? Interlocked.CompareExchange(ref _webhook, (webhook = new Webhook.Webhook(this)), null) ?? webhook;
+                var webhook = _webhook;
+                return webhook ?? Interlocked.CompareExchange(ref _webhook, (webhook = new Webhook.Webhook(this)), null) ?? webhook;
             }
         }
 
@@ -115,8 +116,8 @@ namespace EncompassRest
         {
             get
             {
-                Pipeline pipeline;
-                return _pipeline ?? Interlocked.CompareExchange(ref _pipeline, (pipeline = new Pipeline(this)), null) ?? pipeline;
+                var pipeline = _pipeline;
+                return pipeline ?? Interlocked.CompareExchange(ref _pipeline, (pipeline = new Pipeline(this)), null) ?? pipeline;
             }
         }
 
@@ -124,8 +125,62 @@ namespace EncompassRest
         {
             get
             {
-                BatchUpdate batchUpdate;
-                return _batchUpdate ?? Interlocked.CompareExchange(ref _batchUpdate, (batchUpdate = new BatchUpdate(this)), null) ?? batchUpdate;
+                var batchUpdate = _batchUpdate;
+                return batchUpdate ?? Interlocked.CompareExchange(ref _batchUpdate, (batchUpdate = new BatchUpdate(this)), null) ?? batchUpdate;
+            }
+        }
+
+        public BorrowerContacts BorrowerContacts
+        {
+            get
+            {
+                var borrowerContacts = _borrowerContacts;
+                return borrowerContacts ?? Interlocked.CompareExchange(ref _borrowerContacts, (borrowerContacts = new BorrowerContacts(this)), null) ?? borrowerContacts;
+            }
+        }
+
+        public BusinessContacts BusinessContacts
+        {
+            get
+            {
+                var businessContacts = _businessContacts;
+                return businessContacts ?? Interlocked.CompareExchange(ref _businessContacts, (businessContacts = new BusinessContacts(this)), null) ?? businessContacts;
+            }
+        }
+
+        internal ResourceLocks.ResourceLocks ResourceLocks
+        {
+            get
+            {
+                var resourceLocks = _resourceLocks;
+                return resourceLocks ?? Interlocked.CompareExchange(ref _resourceLocks, (resourceLocks = new ResourceLocks.ResourceLocks(this)), null) ?? resourceLocks;
+            }
+        }
+
+        public GlobalCustomDataObjects GlobalCustomDataObjects
+        {
+            get
+            {
+                var globalCustomDataObjects = _globalCustomDataObjects;
+                return globalCustomDataObjects ?? Interlocked.CompareExchange(ref _globalCustomDataObjects, (globalCustomDataObjects = new GlobalCustomDataObjects(this)), null) ?? globalCustomDataObjects;
+            }
+        }
+
+        public Users.Users Users
+        {
+            get
+            {
+                var users = _users;
+                return users ?? Interlocked.CompareExchange(ref _users, (users = new Users.Users(this)), null) ?? users;
+            }
+        }
+
+        public LoanFolders.LoanFolders LoanFolders
+        {
+            get
+            {
+                var loanFolders = _loanFolders;
+                return loanFolders ?? Interlocked.CompareExchange(ref _loanFolders, (loanFolders = new LoanFolders.LoanFolders(this)), null) ?? loanFolders;
             }
         }
 

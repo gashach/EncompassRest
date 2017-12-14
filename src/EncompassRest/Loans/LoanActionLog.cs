@@ -1,49 +1,40 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class LoanActionLog : IDirty
+    public sealed partial class LoanActionLog : ExtensibleObject, IIdentifiable
     {
         private DirtyList<LogAlert> _alerts;
-        public IList<LogAlert> Alerts { get { return _alerts ?? (_alerts = new DirtyList<LogAlert>()); } set { _alerts = new DirtyList<LogAlert>(value); } }
+        public IList<LogAlert> Alerts { get => _alerts ?? (_alerts = new DirtyList<LogAlert>()); set => _alerts = new DirtyList<LogAlert>(value); }
         private DirtyList<LogComment> _commentList;
-        public IList<LogComment> CommentList { get { return _commentList ?? (_commentList = new DirtyList<LogComment>()); } set { _commentList = new DirtyList<LogComment>(value); } }
+        public IList<LogComment> CommentList { get => _commentList ?? (_commentList = new DirtyList<LogComment>()); set => _commentList = new DirtyList<LogComment>(value); }
         private DirtyValue<string> _comments;
-        public string Comments { get { return _comments; } set { _comments = value; } }
+        public string Comments { get => _comments; set => _comments = value; }
         private DirtyValue<DateTime?> _dateUtc;
-        public DateTime? DateUtc { get { return _dateUtc; } set { _dateUtc = value; } }
+        public DateTime? DateUtc { get => _dateUtc; set => _dateUtc = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<string> _loanActionType;
-        public string LoanActionType { get { return _loanActionType; } set { _loanActionType = value; } }
+        public string LoanActionType { get => _loanActionType; set => _loanActionType = value; }
         private DirtyValue<string> _triggeredBy;
-        public string TriggeredBy { get { return _triggeredBy; } set { _triggeredBy = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string TriggeredBy { get => _triggeredBy; set => _triggeredBy = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _comments.Dirty
+                return _comments.Dirty
                     || _dateUtc.Dirty
                     || _id.Dirty
                     || _loanActionType.Dirty
                     || _triggeredBy.Dirty
                     || _alerts?.Dirty == true
                     || _commentList?.Dirty == true;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _comments.Dirty = value;
                 _dateUtc.Dirty = value;
                 _id.Dirty = value;
@@ -51,9 +42,7 @@ namespace EncompassRest.Loans
                 _triggeredBy.Dirty = value;
                 if (_alerts != null) _alerts.Dirty = value;
                 if (_commentList != null) _commentList.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

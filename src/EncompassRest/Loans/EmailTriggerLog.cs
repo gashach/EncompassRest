@@ -1,52 +1,47 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class EmailTriggerLog : IDirty
+    public sealed partial class EmailTriggerLog : ExtensibleObject, IIdentifiable
     {
         private DirtyList<LogAlert> _alerts;
-        public IList<LogAlert> Alerts { get { return _alerts ?? (_alerts = new DirtyList<LogAlert>()); } set { _alerts = new DirtyList<LogAlert>(value); } }
+        public IList<LogAlert> Alerts { get => _alerts ?? (_alerts = new DirtyList<LogAlert>()); set => _alerts = new DirtyList<LogAlert>(value); }
         private DirtyValue<string> _body;
-        public string Body { get { return _body; } set { _body = value; } }
+        public string Body { get => _body; set => _body = value; }
         private DirtyList<LogComment> _commentList;
-        public IList<LogComment> CommentList { get { return _commentList ?? (_commentList = new DirtyList<LogComment>()); } set { _commentList = new DirtyList<LogComment>(value); } }
+        public IList<LogComment> CommentList { get => _commentList ?? (_commentList = new DirtyList<LogComment>()); set => _commentList = new DirtyList<LogComment>(value); }
         private DirtyValue<string> _comments;
-        public string Comments { get { return _comments; } set { _comments = value; } }
+        public string Comments { get => _comments; set => _comments = value; }
         private DirtyValue<DateTime?> _dateUtc;
-        public DateTime? DateUtc { get { return _dateUtc; } set { _dateUtc = value; } }
+        public DateTime? DateUtc { get => _dateUtc; set => _dateUtc = value; }
         private DirtyValue<bool?> _fileAttachmentsMigrated;
-        public bool? FileAttachmentsMigrated { get { return _fileAttachmentsMigrated; } set { _fileAttachmentsMigrated = value; } }
+        public bool? FileAttachmentsMigrated { get => _fileAttachmentsMigrated; set => _fileAttachmentsMigrated = value; }
         private DirtyValue<string> _guid;
-        public string Guid { get { return _guid; } set { _guid = value; } }
+        public string Guid { get => _guid; set => _guid = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<bool?> _inLogIndicator;
-        public bool? InLogIndicator { get { return _inLogIndicator; } set { _inLogIndicator = value; } }
+        public bool? InLogIndicator { get => _inLogIndicator; set => _inLogIndicator = value; }
         private DirtyValue<bool?> _isSystemSpecificIndicator;
-        public bool? IsSystemSpecificIndicator { get { return _isSystemSpecificIndicator; } set { _isSystemSpecificIndicator = value; } }
+        public bool? IsSystemSpecificIndicator { get => _isSystemSpecificIndicator; set => _isSystemSpecificIndicator = value; }
         private DirtyValue<int?> _logRecordIndex;
-        public int? LogRecordIndex { get { return _logRecordIndex; } set { _logRecordIndex = value; } }
+        public int? LogRecordIndex { get => _logRecordIndex; set => _logRecordIndex = value; }
         private DirtyValue<string> _recipients;
-        public string Recipients { get { return _recipients; } set { _recipients = value; } }
+        public string Recipients { get => _recipients; set => _recipients = value; }
         private DirtyValue<string> _sender;
-        public string Sender { get { return _sender; } set { _sender = value; } }
+        public string Sender { get => _sender; set => _sender = value; }
         private DirtyValue<string> _subject;
-        public string Subject { get { return _subject; } set { _subject = value; } }
+        public string Subject { get => _subject; set => _subject = value; }
         private DirtyValue<string> _systemId;
-        public string SystemId { get { return _systemId; } set { _systemId = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string SystemId { get => _systemId; set => _systemId = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _body.Dirty
+                return _body.Dirty
                     || _comments.Dirty
                     || _dateUtc.Dirty
                     || _fileAttachmentsMigrated.Dirty
@@ -61,13 +56,9 @@ namespace EncompassRest.Loans
                     || _systemId.Dirty
                     || _alerts?.Dirty == true
                     || _commentList?.Dirty == true;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _body.Dirty = value;
                 _comments.Dirty = value;
                 _dateUtc.Dirty = value;
@@ -83,9 +74,7 @@ namespace EncompassRest.Loans
                 _systemId.Dirty = value;
                 if (_alerts != null) _alerts.Dirty = value;
                 if (_commentList != null) _commentList.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

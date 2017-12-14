@@ -17,7 +17,7 @@ namespace EncompassRest.Filters
         [DefaultValue(true)]
         public bool Include { get; }
 
-        public StringFieldFilter(CanonicalField canonicalField, StringFieldMatchType matchType, string value, bool include = true)
+        public StringFieldFilter(CanonicalLoanField canonicalField, StringFieldMatchType matchType, string value, bool include = true)
             : this(canonicalField.Validate(nameof(canonicalField)).GetCanonicalName(), matchType, value, include)
         {
         }
@@ -44,6 +44,6 @@ namespace EncompassRest.Filters
 
         protected override FieldFilter CloneFieldFilter() => Clone();
 
-        protected override string GetMatchType() => MatchType.ToJson().Unquote();
+        protected override string GetMatchType() => MatchType.AsString(EnumJsonConverter.CamelCaseNameFormat);
     }
 }

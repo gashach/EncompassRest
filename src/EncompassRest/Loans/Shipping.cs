@@ -1,54 +1,49 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class Shipping : IDirty
+    public sealed partial class Shipping : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<DateTime?> _actualShipDate;
-        public DateTime? ActualShipDate { get { return _actualShipDate; } set { _actualShipDate = value; } }
+        public DateTime? ActualShipDate { get => _actualShipDate; set => _actualShipDate = value; }
         private DirtyValue<string> _carrierName;
-        public string CarrierName { get { return _carrierName; } set { _carrierName = value; } }
+        public string CarrierName { get => _carrierName; set => _carrierName = value; }
         private DirtyValue<decimal?> _downPaymentAmount;
-        public decimal? DownPaymentAmount { get { return _downPaymentAmount; } set { _downPaymentAmount = value; } }
+        public decimal? DownPaymentAmount { get => _downPaymentAmount; set => _downPaymentAmount = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<DateTime?> _investorDeliveryDate;
-        public DateTime? InvestorDeliveryDate { get { return _investorDeliveryDate; } set { _investorDeliveryDate = value; } }
+        public DateTime? InvestorDeliveryDate { get => _investorDeliveryDate; set => _investorDeliveryDate = value; }
         private DirtyValue<string> _packageTrackingNumber;
-        public string PackageTrackingNumber { get { return _packageTrackingNumber; } set { _packageTrackingNumber = value; } }
+        public string PackageTrackingNumber { get => _packageTrackingNumber; set => _packageTrackingNumber = value; }
         private DirtyValue<string> _physicalFileStorageComments;
-        public string PhysicalFileStorageComments { get { return _physicalFileStorageComments; } set { _physicalFileStorageComments = value; } }
+        public string PhysicalFileStorageComments { get => _physicalFileStorageComments; set => _physicalFileStorageComments = value; }
         private DirtyValue<string> _physicalFileStorageId;
-        public string PhysicalFileStorageId { get { return _physicalFileStorageId; } set { _physicalFileStorageId = value; } }
+        public string PhysicalFileStorageId { get => _physicalFileStorageId; set => _physicalFileStorageId = value; }
         private DirtyValue<string> _physicalFileStorageLocation;
-        public string PhysicalFileStorageLocation { get { return _physicalFileStorageLocation; } set { _physicalFileStorageLocation = value; } }
+        public string PhysicalFileStorageLocation { get => _physicalFileStorageLocation; set => _physicalFileStorageLocation = value; }
         private DirtyValue<string> _poolID;
-        public string PoolID { get { return _poolID; } set { _poolID = value; } }
+        public string PoolID { get => _poolID; set => _poolID = value; }
         private DirtyValue<string> _poolNumber;
-        public string PoolNumber { get { return _poolNumber; } set { _poolNumber = value; } }
+        public string PoolNumber { get => _poolNumber; set => _poolNumber = value; }
         private DirtyValue<string> _recordingNumber;
-        public string RecordingNumber { get { return _recordingNumber; } set { _recordingNumber = value; } }
+        public string RecordingNumber { get => _recordingNumber; set => _recordingNumber = value; }
         private DirtyValue<string> _shipmentMethod;
-        public string ShipmentMethod { get { return _shipmentMethod; } set { _shipmentMethod = value; } }
+        public string ShipmentMethod { get => _shipmentMethod; set => _shipmentMethod = value; }
         private DirtyValue<string> _shipperName;
-        public string ShipperName { get { return _shipperName; } set { _shipperName = value; } }
+        public string ShipperName { get => _shipperName; set => _shipperName = value; }
         private DirtyList<ShippingContact> _shippingContacts;
-        public IList<ShippingContact> ShippingContacts { get { return _shippingContacts ?? (_shippingContacts = new DirtyList<ShippingContact>()); } set { _shippingContacts = new DirtyList<ShippingContact>(value); } }
+        public IList<ShippingContact> ShippingContacts { get => _shippingContacts ?? (_shippingContacts = new DirtyList<ShippingContact>()); set => _shippingContacts = new DirtyList<ShippingContact>(value); }
         private DirtyValue<DateTime?> _targetDeliveryDate;
-        public DateTime? TargetDeliveryDate { get { return _targetDeliveryDate; } set { _targetDeliveryDate = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public DateTime? TargetDeliveryDate { get => _targetDeliveryDate; set => _targetDeliveryDate = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _actualShipDate.Dirty
+                return _actualShipDate.Dirty
                     || _carrierName.Dirty
                     || _downPaymentAmount.Dirty
                     || _id.Dirty
@@ -64,13 +59,9 @@ namespace EncompassRest.Loans
                     || _shipperName.Dirty
                     || _targetDeliveryDate.Dirty
                     || _shippingContacts?.Dirty == true;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _actualShipDate.Dirty = value;
                 _carrierName.Dirty = value;
                 _downPaymentAmount.Dirty = value;
@@ -87,9 +78,7 @@ namespace EncompassRest.Loans
                 _shipperName.Dirty = value;
                 _targetDeliveryDate.Dirty = value;
                 if (_shippingContacts != null) _shippingContacts.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

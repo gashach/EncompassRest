@@ -1,62 +1,57 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class GfePayment : IDirty
+    public sealed partial class GfePayment : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _fixedRate;
-        public decimal? FixedRate { get { return _fixedRate; } set { _fixedRate = value; } }
+        public decimal? FixedRate { get => _fixedRate; set => _fixedRate = value; }
         private DirtyValue<int?> _gfePaymentIndex;
-        public int? GfePaymentIndex { get { return _gfePaymentIndex; } set { _gfePaymentIndex = value; } }
+        public int? GfePaymentIndex { get => _gfePaymentIndex; set => _gfePaymentIndex = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<decimal?> _indexRate;
-        public decimal? IndexRate { get { return _indexRate; } set { _indexRate = value; } }
-        private DirtyValue<string> _isBalanceReduced;
-        public string IsBalanceReduced { get { return _isBalanceReduced; } set { _isBalanceReduced = value; } }
+        public decimal? IndexRate { get => _indexRate; set => _indexRate = value; }
+        private DirtyValue<StringEnumValue<YesOrNo>> _isBalanceReduced;
+        public StringEnumValue<YesOrNo> IsBalanceReduced { get => _isBalanceReduced; set => _isBalanceReduced = value; }
         private DirtyValue<string> _loanTypeExplanation;
-        public string LoanTypeExplanation { get { return _loanTypeExplanation; } set { _loanTypeExplanation = value; } }
+        public string LoanTypeExplanation { get => _loanTypeExplanation; set => _loanTypeExplanation = value; }
         private DirtyValue<decimal?> _marginRate;
-        public decimal? MarginRate { get { return _marginRate; } set { _marginRate = value; } }
+        public decimal? MarginRate { get => _marginRate; set => _marginRate = value; }
         private DirtyValue<decimal?> _maximumDifference;
-        public decimal? MaximumDifference { get { return _maximumDifference; } set { _maximumDifference = value; } }
+        public decimal? MaximumDifference { get => _maximumDifference; set => _maximumDifference = value; }
         private DirtyValue<decimal?> _maximumRate;
-        public decimal? MaximumRate { get { return _maximumRate; } set { _maximumRate = value; } }
+        public decimal? MaximumRate { get => _maximumRate; set => _maximumRate = value; }
         private DirtyValue<decimal?> _minimumDifference;
-        public decimal? MinimumDifference { get { return _minimumDifference; } set { _minimumDifference = value; } }
+        public decimal? MinimumDifference { get => _minimumDifference; set => _minimumDifference = value; }
         private DirtyValue<decimal?> _minimumMonthlyPayment;
-        public decimal? MinimumMonthlyPayment { get { return _minimumMonthlyPayment; } set { _minimumMonthlyPayment = value; } }
+        public decimal? MinimumMonthlyPayment { get => _minimumMonthlyPayment; set => _minimumMonthlyPayment = value; }
         private DirtyValue<decimal?> _monthlyPaymentYear1;
-        public decimal? MonthlyPaymentYear1 { get { return _monthlyPaymentYear1; } set { _monthlyPaymentYear1 = value; } }
+        public decimal? MonthlyPaymentYear1 { get => _monthlyPaymentYear1; set => _monthlyPaymentYear1 = value; }
         private DirtyValue<decimal?> _monthlyPaymentYear6;
-        public decimal? MonthlyPaymentYear6 { get { return _monthlyPaymentYear6; } set { _monthlyPaymentYear6 = value; } }
+        public decimal? MonthlyPaymentYear6 { get => _monthlyPaymentYear6; set => _monthlyPaymentYear6 = value; }
         private DirtyValue<decimal?> _monthlyPaymentYear6Change;
-        public decimal? MonthlyPaymentYear6Change { get { return _monthlyPaymentYear6Change; } set { _monthlyPaymentYear6Change = value; } }
+        public decimal? MonthlyPaymentYear6Change { get => _monthlyPaymentYear6Change; set => _monthlyPaymentYear6Change = value; }
         private DirtyValue<decimal?> _monthlyPaymentYear6MaxChange;
-        public decimal? MonthlyPaymentYear6MaxChange { get { return _monthlyPaymentYear6MaxChange; } set { _monthlyPaymentYear6MaxChange = value; } }
+        public decimal? MonthlyPaymentYear6MaxChange { get => _monthlyPaymentYear6MaxChange; set => _monthlyPaymentYear6MaxChange = value; }
         private DirtyValue<bool?> _notOfferedIndicator;
-        public bool? NotOfferedIndicator { get { return _notOfferedIndicator; } set { _notOfferedIndicator = value; } }
+        public bool? NotOfferedIndicator { get => _notOfferedIndicator; set => _notOfferedIndicator = value; }
         private DirtyValue<decimal?> _owedAfter5Years;
-        public decimal? OwedAfter5Years { get { return _owedAfter5Years; } set { _owedAfter5Years = value; } }
+        public decimal? OwedAfter5Years { get => _owedAfter5Years; set => _owedAfter5Years = value; }
         private DirtyValue<decimal?> _rateInMonth2;
-        public decimal? RateInMonth2 { get { return _rateInMonth2; } set { _rateInMonth2 = value; } }
+        public decimal? RateInMonth2 { get => _rateInMonth2; set => _rateInMonth2 = value; }
         private DirtyValue<decimal?> _reducedLoanBalance;
-        public decimal? ReducedLoanBalance { get { return _reducedLoanBalance; } set { _reducedLoanBalance = value; } }
-        private DirtyValue<string> _reducedStatus;
-        public string ReducedStatus { get { return _reducedStatus; } set { _reducedStatus = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public decimal? ReducedLoanBalance { get => _reducedLoanBalance; set => _reducedLoanBalance = value; }
+        private DirtyValue<StringEnumValue<ReducedStatus>> _reducedStatus;
+        public StringEnumValue<ReducedStatus> ReducedStatus { get => _reducedStatus; set => _reducedStatus = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _fixedRate.Dirty
+                return _fixedRate.Dirty
                     || _gfePaymentIndex.Dirty
                     || _id.Dirty
                     || _indexRate.Dirty
@@ -76,13 +71,9 @@ namespace EncompassRest.Loans
                     || _rateInMonth2.Dirty
                     || _reducedLoanBalance.Dirty
                     || _reducedStatus.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _fixedRate.Dirty = value;
                 _gfePaymentIndex.Dirty = value;
                 _id.Dirty = value;
@@ -103,9 +94,7 @@ namespace EncompassRest.Loans
                 _rateInMonth2.Dirty = value;
                 _reducedLoanBalance.Dirty = value;
                 _reducedStatus.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

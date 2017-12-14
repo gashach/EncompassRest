@@ -1,43 +1,32 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class FieldLockData : IDirty
+    public sealed partial class FieldLockData : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<bool?> _lockRemoved;
-        public bool? LockRemoved { get { return _lockRemoved; } set { _lockRemoved = value; } }
+        public bool? LockRemoved { get => _lockRemoved; set => _lockRemoved = value; }
         private DirtyValue<string> _modelPath;
-        public string ModelPath { get { return _modelPath; } set { _modelPath = value; } }
+        public string ModelPath { get => _modelPath; set => _modelPath = value; }
         private DirtyValue<string> _value;
-        public string Value { get { return _value; } set { _value = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string Value { get => _value; set => _value = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _lockRemoved.Dirty
+                return _lockRemoved.Dirty
                     || _modelPath.Dirty
                     || _value.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _lockRemoved.Dirty = value;
                 _modelPath.Dirty = value;
                 _value.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

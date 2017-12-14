@@ -1,44 +1,39 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class FundingFee : IDirty
+    public sealed partial class FundingFee : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<bool?> _balanceChecked;
-        public bool? BalanceChecked { get { return _balanceChecked; } set { _balanceChecked = value; } }
+        public bool? BalanceChecked { get => _balanceChecked; set => _balanceChecked = value; }
         private DirtyValue<string> _cdLineId;
-        public string CdLineId { get { return _cdLineId; } set { _cdLineId = value; } }
+        public string CdLineId { get => _cdLineId; set => _cdLineId = value; }
         private DirtyValue<string> _feeDescription;
-        public string FeeDescription { get { return _feeDescription; } set { _feeDescription = value; } }
+        public string FeeDescription { get => _feeDescription; set => _feeDescription = value; }
         private DirtyValue<string> _feeDescription2015;
-        public string FeeDescription2015 { get { return _feeDescription2015; } set { _feeDescription2015 = value; } }
+        public string FeeDescription2015 { get => _feeDescription2015; set => _feeDescription2015 = value; }
         private DirtyValue<string> _lineId;
-        public string LineId { get { return _lineId; } set { _lineId = value; } }
+        public string LineId { get => _lineId; set => _lineId = value; }
         private DirtyValue<int?> _lineNumber;
-        public int? LineNumber { get { return _lineNumber; } set { _lineNumber = value; } }
+        public int? LineNumber { get => _lineNumber; set => _lineNumber = value; }
         private DirtyValue<string> _paidBy;
-        public string PaidBy { get { return _paidBy; } set { _paidBy = value; } }
+        public string PaidBy { get => _paidBy; set => _paidBy = value; }
         private DirtyValue<string> _paidTo;
-        public string PaidTo { get { return _paidTo; } set { _paidTo = value; } }
+        public string PaidTo { get => _paidTo; set => _paidTo = value; }
         private DirtyValue<string> _payee;
-        public string Payee { get { return _payee; } set { _payee = value; } }
+        public string Payee { get => _payee; set => _payee = value; }
         private DirtyValue<string> _pocPaidBy;
-        public string PocPaidBy { get { return _pocPaidBy; } set { _pocPaidBy = value; } }
+        public string PocPaidBy { get => _pocPaidBy; set => _pocPaidBy = value; }
         private DirtyValue<string> _ptcPaidBy;
-        public string PtcPaidBy { get { return _ptcPaidBy; } set { _ptcPaidBy = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string PtcPaidBy { get => _ptcPaidBy; set => _ptcPaidBy = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _balanceChecked.Dirty
+                return _balanceChecked.Dirty
                     || _cdLineId.Dirty
                     || _feeDescription.Dirty
                     || _feeDescription2015.Dirty
@@ -49,13 +44,9 @@ namespace EncompassRest.Loans
                     || _payee.Dirty
                     || _pocPaidBy.Dirty
                     || _ptcPaidBy.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _balanceChecked.Dirty = value;
                 _cdLineId.Dirty = value;
                 _feeDescription.Dirty = value;
@@ -67,9 +58,7 @@ namespace EncompassRest.Loans
                 _payee.Dirty = value;
                 _pocPaidBy.Dirty = value;
                 _ptcPaidBy.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

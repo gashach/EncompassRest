@@ -1,47 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using EncompassRest.Utilities;
+using EnumsNET;
 using Newtonsoft.Json;
 
 namespace EncompassRest.Loans.Attachments
 {
-    public sealed class LoanAttachment : IDirty
+    public sealed class LoanAttachment : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _attachmentId;
-        public string AttachmentId { get { return _attachmentId; } set { _attachmentId = value; } }
+        public string AttachmentId { get => _attachmentId; set => _attachmentId = value; }
         private DirtyValue<DateTime?> _dateCreated;
-        public DateTime? DateCreated { get { return _dateCreated; } set { _dateCreated = value; } }
+        public DateTime? DateCreated { get => _dateCreated; set => _dateCreated = value; }
         private DirtyValue<string> _createdBy;
-        public string CreatedBy { get { return _createdBy; } set { _createdBy = value; } }
+        public string CreatedBy { get => _createdBy; set => _createdBy = value; }
         private DirtyValue<string> _createdByName;
-        public string CreatedByName { get { return _createdByName; } set { _createdByName = value; } }
+        public string CreatedByName { get => _createdByName; set => _createdByName = value; }
         private DirtyValue<AttachmentCreateReason?> _createReason;
-        [EnumOutput(EnumOutput.Integer)]
-        public AttachmentCreateReason? CreateReason { get { return _createReason; } set { _createReason = value; } }
+        [EnumFormat(EnumFormat.DecimalValue)]
+        public AttachmentCreateReason? CreateReason { get => _createReason; set => _createReason = value; }
         private DirtyValue<AttachmentType?> _attachmentType;
-        [EnumOutput(EnumOutput.Integer)]
-        public AttachmentType? AttachmentType { get { return _attachmentType; } set { _attachmentType = value; } }
+        [EnumFormat(EnumFormat.DecimalValue)]
+        public AttachmentType? AttachmentType { get => _attachmentType; set => _attachmentType = value; }
         private DirtyValue<long?> _fileSize;
-        public long? FileSize { get { return _fileSize; } set { _fileSize = value; } }
+        public long? FileSize { get => _fileSize; set => _fileSize = value; }
         private DirtyValue<bool?> _isActive;
-        public bool? IsActive { get { return _isActive; } set { _isActive = value; } }
+        public bool? IsActive { get => _isActive; set => _isActive = value; }
         private DirtyList<PageImage> _pages;
-        public IList<PageImage> Pages { get { return _pages ?? (_pages = new DirtyList<PageImage>()); } set { _pages = new DirtyList<PageImage>(value); } }
+        public IList<PageImage> Pages { get => _pages ?? (_pages = new DirtyList<PageImage>()); set => _pages = new DirtyList<PageImage>(value); }
         private DirtyValue<int?> _rotation;
-        public int? Rotation { get { return _rotation; } set { _rotation = value; } }
+        public int? Rotation { get => _rotation; set => _rotation = value; }
         private DirtyValue<string> _title;
-        public string Title { get { return _title; } set { _title = value; } }
+        public string Title { get => _title; set => _title = value; }
+        private EntityReference _document;
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public EntityReference Document { get; set; }
-        private bool _gettingDirty;
-        private bool _settingDirty;
-        internal bool Dirty
+        public EntityReference Document { get => _document; set => _document = value; }
+        [IdPropertyName(nameof(AttachmentId))]
+        string IIdentifiable.Id { get => AttachmentId; set => AttachmentId = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _attachmentId.Dirty
+                return _attachmentId.Dirty
                     || _dateCreated.Dirty
                     || _createdBy.Dirty
                     || _createdByName.Dirty
@@ -51,14 +51,11 @@ namespace EncompassRest.Loans.Attachments
                     || _isActive.Dirty
                     || _pages?.Dirty == true
                     || _rotation.Dirty
-                    || _title.Dirty;
-                _gettingDirty = false;
-                return dirty;
+                    || _title.Dirty
+                    || _document?.Dirty == true;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _attachmentId.Dirty = value;
                 _dateCreated.Dirty = value;
                 _createdBy.Dirty = value;
@@ -70,9 +67,8 @@ namespace EncompassRest.Loans.Attachments
                 if (_pages != null) _pages.Dirty = value;
                 _rotation.Dirty = value;
                 _title.Dirty = value;
-                _settingDirty = false;
+                if (_document != null) _document.Dirty = value;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

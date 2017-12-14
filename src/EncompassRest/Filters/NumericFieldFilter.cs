@@ -12,7 +12,7 @@ namespace EncompassRest.Filters
         [JsonRequired]
         public decimal Value { get; }
 
-        public NumericFieldFilter(CanonicalField canonicalField, OrdinalFieldMatchType matchType, decimal value)
+        public NumericFieldFilter(CanonicalLoanField canonicalField, OrdinalFieldMatchType matchType, decimal value)
             : this(canonicalField.Validate(nameof(canonicalField)).GetCanonicalName(), matchType, value)
         {
         }
@@ -37,6 +37,6 @@ namespace EncompassRest.Filters
 
         protected override FieldFilter CloneFieldFilter() => Clone();
 
-        protected override string GetMatchType() => MatchType.ToJson().Unquote();
+        protected override string GetMatchType() => MatchType.AsString(EnumJsonConverter.CamelCaseNameFormat);
     }
 }

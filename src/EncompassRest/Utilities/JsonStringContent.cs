@@ -1,13 +1,17 @@
 ﻿using System.Net.Http;
-using System.Text;
+using System.Net.Http.Headers;
 
 namespace EncompassRest.Utilities
 {
     internal sealed class JsonStringContent : StringContent
     {
+        public string Json { get; }
+
         public JsonStringContent(string json)
-            : base(json, Encoding.UTF8, "application/json")
+            : base(json)
         {
+            Json = json;
+            Headers.ContentType = new MediaTypeHeaderValue("application/json");
         }
     }
 }

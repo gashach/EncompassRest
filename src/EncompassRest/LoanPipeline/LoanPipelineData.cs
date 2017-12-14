@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace EncompassRest.LoanPipeline
 {
-    public sealed class LoanPipelineData
+    public sealed class LoanPipelineData : ExtensibleObject
     {
         private Dictionary<string, string> _fields;
 
@@ -13,14 +13,8 @@ namespace EncompassRest.LoanPipeline
 
         public Dictionary<string, string> Fields
         {
-            get
-            {
-                return _fields;
-            }
-            set
-            {
-                _fields = value?.Comparer == StringComparer.OrdinalIgnoreCase ? value : new Dictionary<string, string>(value, StringComparer.OrdinalIgnoreCase);
-            }
+            get => _fields;
+            set => _fields = value?.Comparer == StringComparer.OrdinalIgnoreCase ? value : new Dictionary<string, string>(value, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

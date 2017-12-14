@@ -1,49 +1,40 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class ProfitManagementItem : IDirty
+    public sealed partial class ProfitManagementItem : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _atPercent;
-        public decimal? AtPercent { get { return _atPercent; } set { _atPercent = value; } }
+        public decimal? AtPercent { get => _atPercent; set => _atPercent = value; }
         private DirtyValue<string> _description;
-        public string Description { get { return _description; } set { _description = value; } }
+        public string Description { get => _description; set => _description = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<decimal?> _plusAmount;
-        public decimal? PlusAmount { get { return _plusAmount; } set { _plusAmount = value; } }
+        public decimal? PlusAmount { get => _plusAmount; set => _plusAmount = value; }
         private DirtyValue<int?> _profitManagementItemIndex;
-        public int? ProfitManagementItemIndex { get { return _profitManagementItemIndex; } set { _profitManagementItemIndex = value; } }
+        public int? ProfitManagementItemIndex { get => _profitManagementItemIndex; set => _profitManagementItemIndex = value; }
         private DirtyValue<decimal?> _total;
-        public decimal? Total { get { return _total; } set { _total = value; } }
-        private DirtyValue<string> _type;
-        public string Type { get { return _type; } set { _type = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public decimal? Total { get => _total; set => _total = value; }
+        private DirtyValue<StringEnumValue<ProfitManagementItemType>> _type;
+        public StringEnumValue<ProfitManagementItemType> Type { get => _type; set => _type = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _atPercent.Dirty
+                return _atPercent.Dirty
                     || _description.Dirty
                     || _id.Dirty
                     || _plusAmount.Dirty
                     || _profitManagementItemIndex.Dirty
                     || _total.Dirty
                     || _type.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _atPercent.Dirty = value;
                 _description.Dirty = value;
                 _id.Dirty = value;
@@ -51,9 +42,7 @@ namespace EncompassRest.Loans
                 _profitManagementItemIndex.Dirty = value;
                 _total.Dirty = value;
                 _type.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

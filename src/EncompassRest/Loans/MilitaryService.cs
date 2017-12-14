@@ -1,40 +1,35 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class MilitaryService : IDirty
+    public sealed partial class MilitaryService : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _branch;
-        public string Branch { get { return _branch; } set { _branch = value; } }
+        public string Branch { get => _branch; set => _branch = value; }
         private DirtyValue<DateTime?> _endDate;
-        public DateTime? EndDate { get { return _endDate; } set { _endDate = value; } }
+        public DateTime? EndDate { get => _endDate; set => _endDate = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<int?> _militaryServiceIndex;
-        public int? MilitaryServiceIndex { get { return _militaryServiceIndex; } set { _militaryServiceIndex = value; } }
+        public int? MilitaryServiceIndex { get => _militaryServiceIndex; set => _militaryServiceIndex = value; }
         private DirtyValue<string> _name;
-        public string Name { get { return _name; } set { _name = value; } }
-        private DirtyValue<string> _officerOrEnlisted;
-        public string OfficerOrEnlisted { get { return _officerOrEnlisted; } set { _officerOrEnlisted = value; } }
+        public string Name { get => _name; set => _name = value; }
+        private DirtyValue<StringEnumValue<OfficerOrEnlisted>> _officerOrEnlisted;
+        public StringEnumValue<OfficerOrEnlisted> OfficerOrEnlisted { get => _officerOrEnlisted; set => _officerOrEnlisted = value; }
         private DirtyValue<string> _serviceNumber;
-        public string ServiceNumber { get { return _serviceNumber; } set { _serviceNumber = value; } }
+        public string ServiceNumber { get => _serviceNumber; set => _serviceNumber = value; }
         private DirtyValue<string> _sSN;
-        public string SSN { get { return _sSN; } set { _sSN = value; } }
+        public string SSN { get => _sSN; set => _sSN = value; }
         private DirtyValue<DateTime?> _startDate;
-        public DateTime? StartDate { get { return _startDate; } set { _startDate = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public DateTime? StartDate { get => _startDate; set => _startDate = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _branch.Dirty
+                return _branch.Dirty
                     || _endDate.Dirty
                     || _id.Dirty
                     || _militaryServiceIndex.Dirty
@@ -43,13 +38,9 @@ namespace EncompassRest.Loans
                     || _serviceNumber.Dirty
                     || _sSN.Dirty
                     || _startDate.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _branch.Dirty = value;
                 _endDate.Dirty = value;
                 _id.Dirty = value;
@@ -59,9 +50,7 @@ namespace EncompassRest.Loans
                 _serviceNumber.Dirty = value;
                 _sSN.Dirty = value;
                 _startDate.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

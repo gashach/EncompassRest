@@ -1,42 +1,37 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class Buydown : IDirty
+    public sealed partial class Buydown : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<int?> _buydownIndex;
-        public int? BuydownIndex { get { return _buydownIndex; } set { _buydownIndex = value; } }
+        public int? BuydownIndex { get => _buydownIndex; set => _buydownIndex = value; }
         private DirtyValue<decimal?> _buydownRatePercent;
-        public decimal? BuydownRatePercent { get { return _buydownRatePercent; } set { _buydownRatePercent = value; } }
+        public decimal? BuydownRatePercent { get => _buydownRatePercent; set => _buydownRatePercent = value; }
         private DirtyValue<int?> _changeFrequencyMonthsCount;
-        public int? ChangeFrequencyMonthsCount { get { return _changeFrequencyMonthsCount; } set { _changeFrequencyMonthsCount = value; } }
+        public int? ChangeFrequencyMonthsCount { get => _changeFrequencyMonthsCount; set => _changeFrequencyMonthsCount = value; }
         private DirtyValue<int?> _durationMonthsCount;
-        public int? DurationMonthsCount { get { return _durationMonthsCount; } set { _durationMonthsCount = value; } }
+        public int? DurationMonthsCount { get => _durationMonthsCount; set => _durationMonthsCount = value; }
         private DirtyValue<decimal?> _fundBalanceAmount;
-        public decimal? FundBalanceAmount { get { return _fundBalanceAmount; } set { _fundBalanceAmount = value; } }
+        public decimal? FundBalanceAmount { get => _fundBalanceAmount; set => _fundBalanceAmount = value; }
         private DirtyValue<decimal?> _fundTotalAmount;
-        public decimal? FundTotalAmount { get { return _fundTotalAmount; } set { _fundTotalAmount = value; } }
+        public decimal? FundTotalAmount { get => _fundTotalAmount; set => _fundTotalAmount = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<decimal?> _increaseRatePercent;
-        public decimal? IncreaseRatePercent { get { return _increaseRatePercent; } set { _increaseRatePercent = value; } }
+        public decimal? IncreaseRatePercent { get => _increaseRatePercent; set => _increaseRatePercent = value; }
         private DirtyValue<int?> _remainingMonthsCount;
-        public int? RemainingMonthsCount { get { return _remainingMonthsCount; } set { _remainingMonthsCount = value; } }
+        public int? RemainingMonthsCount { get => _remainingMonthsCount; set => _remainingMonthsCount = value; }
         private DirtyValue<decimal?> _subsidyAmount;
-        public decimal? SubsidyAmount { get { return _subsidyAmount; } set { _subsidyAmount = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public decimal? SubsidyAmount { get => _subsidyAmount; set => _subsidyAmount = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _buydownIndex.Dirty
+                return _buydownIndex.Dirty
                     || _buydownRatePercent.Dirty
                     || _changeFrequencyMonthsCount.Dirty
                     || _durationMonthsCount.Dirty
@@ -46,13 +41,9 @@ namespace EncompassRest.Loans
                     || _increaseRatePercent.Dirty
                     || _remainingMonthsCount.Dirty
                     || _subsidyAmount.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _buydownIndex.Dirty = value;
                 _buydownRatePercent.Dirty = value;
                 _changeFrequencyMonthsCount.Dirty = value;
@@ -63,9 +54,7 @@ namespace EncompassRest.Loans
                 _increaseRatePercent.Dirty = value;
                 _remainingMonthsCount.Dirty = value;
                 _subsidyAmount.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

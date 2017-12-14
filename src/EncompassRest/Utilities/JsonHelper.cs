@@ -7,23 +7,63 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using EncompassRest.Loans;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace EncompassRest.Utilities
 {
     internal static class JsonHelper
     {
+        internal static readonly CamelCaseNamingStrategy CamelCaseNamingStrategy = new CamelCaseNamingStrategy();
+        private static readonly PublicContractResolver s_publicContractResolver = new PublicContractResolver();
+
+        public static JsonSerializer CreatePublicSerializer(JsonSerializer existingSerializer)
+        {
+            var publicSerializer = new JsonSerializer
+            {
+                Binder = existingSerializer.Binder,
+                CheckAdditionalContent = existingSerializer.CheckAdditionalContent,
+                ConstructorHandling = existingSerializer.ConstructorHandling,
+                Context = existingSerializer.Context,
+                ContractResolver = s_publicContractResolver,
+                Culture = existingSerializer.Culture,
+                DateFormatHandling = existingSerializer.DateFormatHandling,
+                DateFormatString = existingSerializer.DateFormatString,
+                DateParseHandling = existingSerializer.DateParseHandling,
+                DateTimeZoneHandling = existingSerializer.DateTimeZoneHandling,
+                DefaultValueHandling = existingSerializer.DefaultValueHandling,
+                EqualityComparer = existingSerializer.EqualityComparer,
+                FloatFormatHandling = existingSerializer.FloatFormatHandling,
+                FloatParseHandling = existingSerializer.FloatParseHandling,
+                Formatting = existingSerializer.Formatting,
+                MaxDepth = existingSerializer.MaxDepth,
+                MetadataPropertyHandling = existingSerializer.MetadataPropertyHandling,
+                MissingMemberHandling = existingSerializer.MissingMemberHandling,
+                NullValueHandling = existingSerializer.NullValueHandling,
+                ObjectCreationHandling = existingSerializer.ObjectCreationHandling,
+                PreserveReferencesHandling = existingSerializer.PreserveReferencesHandling,
+                ReferenceLoopHandling = existingSerializer.ReferenceLoopHandling,
+                ReferenceResolver = existingSerializer.ReferenceResolver,
+                StringEscapeHandling = existingSerializer.StringEscapeHandling,
+                TraceWriter = existingSerializer.TraceWriter,
+                TypeNameAssemblyFormat = existingSerializer.TypeNameAssemblyFormat,
+                TypeNameHandling = existingSerializer.TypeNameHandling
+            };
+            foreach (var converter in existingSerializer.Converters)
+            {
+                publicSerializer.Converters.Add(converter);
+            }
+            return publicSerializer;
+        }
+
         private static readonly JsonSerializer s_serializer = JsonSerializer.Create(new JsonSerializerSettings
         {
             Formatting = Formatting.None,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
-            ContractResolver = new CustomContractResolver()
+            ContractResolver = new PrivateContractResolver()
         });
 
-        public static T FromJson<T>(string json) => (T)FromJson(json, typeof(T));
+        public static T FromJson<T>(string json) => (T)FromJson(json, TypeData<T>.Type);
 
         public static object FromJson(string json) => FromJson(json, null);
 
@@ -35,7 +75,7 @@ namespace EncompassRest.Utilities
             }
         }
 
-        public static T FromJson<T>(TextReader reader) => (T)FromJson(reader, typeof(T));
+        public static T FromJson<T>(TextReader reader) => (T)FromJson(reader, TypeData<T>.Type);
 
         public static object FromJson(TextReader reader) => FromJson(reader, null);
 
@@ -51,7 +91,7 @@ namespace EncompassRest.Utilities
 
         public static void PopulateFromJson(TextReader reader, object target) => s_serializer.Populate(reader, target);
 
-        public static string ToJson<T>(this T value) => ToJson(value, typeof(T));
+        public static string ToJson<T>(this T value) => ToJson(value, TypeData<T>.Type);
 
         public static string ToJson(object value) => ToJson(value, (Type)null);
 
@@ -64,40 +104,11 @@ namespace EncompassRest.Utilities
             }
         }
 
-        public static void ToJson<T>(T value, TextWriter writer) => ToJson(value, typeof(T), writer);
+        public static void ToJson<T>(T value, TextWriter writer) => ToJson(value, TypeData<T>.Type, writer);
 
         public static void ToJson(object value, TextWriter writer) => ToJson(value, null, writer);
 
         public static void ToJson(object value, Type type, TextWriter writer) => s_serializer.Serialize(writer, value, type);
-
-        public static List<JToken> FindTokens(this JToken containerToken, string name)
-        {
-            var matches = new List<JToken>();
-            FindTokens(containerToken, name, matches);
-            return matches;
-        }
-
-        private static void FindTokens(JToken containerToken, string name, List<JToken> matches)
-        {
-            if (containerToken.Type == JTokenType.Object)
-            {
-                foreach (var child in containerToken.Children<JProperty>())
-                {
-                    if (child.Name == name)
-                    {
-                        matches.Add(child.Value);
-                    }
-                    FindTokens(child.Value, name, matches);
-                }
-            }
-            else if (containerToken.Type == JTokenType.Array)
-            {
-                foreach (var child in containerToken.Children())
-                {
-                    FindTokens(child, name, matches);
-                }
-            }
-        }
 
         public static async Task<T> ReadAsAsync<T>(this HttpContent content)
         {
@@ -121,9 +132,9 @@ namespace EncompassRest.Utilities
             }
         }
 
-        private sealed class CustomContractResolver : DefaultContractResolver
+        private abstract class CustomContractResolver : DefaultContractResolver
         {
-            private static readonly JsonConverter s_enumConverter = new EnumJsonConverter(EnumOutput.CamelCaseName);
+            protected static readonly JsonConverter DefaultEnumConverter = new EnumJsonConverter(EnumJsonConverter.CamelCaseNameFormat);
 
             public CustomContractResolver()
             {
@@ -133,73 +144,137 @@ namespace EncompassRest.Utilities
             protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
             {
                 var property = base.CreateProperty(member, memberSerialization);
-                var propertyInfo = member as PropertyInfo;
-                if (propertyInfo != null)
+                if (member is PropertyInfo propertyInfo)
                 {
-                    var enumOutputAttribute = propertyInfo.GetCustomAttribute<EnumOutputAttribute>(false);
-                    if (enumOutputAttribute != null)
+                    var enumFormatAttribute = (EnumFormatAttribute)property.AttributeProvider.GetAttributes(TypeData<EnumFormatAttribute>.Type, false).FirstOrDefault();
+                    if (enumFormatAttribute != null)
                     {
-                        property.Converter = new EnumJsonConverter(enumOutputAttribute.EnumOutput);
+                        property.Converter = new EnumJsonConverter(enumFormatAttribute.EnumFormat);
                     }
-                    var toAssignShouldSerializeMethod = true;
-                    if (member.DeclaringType == TypeData<CustomField>.Type)
-                    {
-                        if (propertyInfo.Name == "Id")
-                        {
-                            property.ShouldSerialize = o => false;
-                            toAssignShouldSerializeMethod = false;
-                        }
-                        else if (propertyInfo.Name == "FieldName")
-                        {
-                            property.ShouldSerialize = o => true;
-                            toAssignShouldSerializeMethod = false;
-                        }
-                    }
-                    if (toAssignShouldSerializeMethod)
-                    {
-                        var propertyName = propertyInfo.Name;
-                        if (propertyName == "Id")
-                        {
-                            property.ShouldSerialize = o => propertyInfo.GetValue(o) != null;
-                        }
-                        else
-                        {
-                            var backingFieldName = $"_{char.ToLower(propertyName[0])}{propertyName.Substring(1)}";
-                            var backingField = propertyInfo.DeclaringType.GetTypeInfo().DeclaredFields.FirstOrDefault(f => f.Name == backingFieldName && f.FieldType.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IDirty)));
-                            if (backingField != null)
-                            {
-                                property.ShouldSerialize = o => o != null && ((IDirty)backingField.GetValue(o))?.Dirty == true;
-                            }
-                        }
-                    }
+                    PopulateShouldSerializeMethod(property, propertyInfo);
                 }
                 return property;
             }
 
+            protected abstract void PopulateShouldSerializeMethod(JsonProperty property, PropertyInfo propertyInfo);
+
             protected override JsonConverter ResolveContractConverter(Type objectType)
             {
                 var typeData = TypeData.Get(objectType);
+                var typeInfo = typeData.TypeInfo;
                 if (typeData.IsEnum || typeData.NonNullableValueTypeData?.IsEnum == true)
                 {
-                    var enumOutputAttribute = typeData.TypeInfo.GetCustomAttribute<EnumOutputAttribute>();
-                    if (enumOutputAttribute != null)
+                    var enumFormatAttribute = (typeData.NonNullableValueTypeData?.TypeInfo ?? typeInfo).GetCustomAttribute<EnumFormatAttribute>();
+                    if (enumFormatAttribute != null)
                     {
-                        return new EnumJsonConverter(enumOutputAttribute.EnumOutput);
+                        return new EnumJsonConverter(enumFormatAttribute.EnumFormat);
                     }
                     else
                     {
-                        return s_enumConverter;
+                        return DefaultEnumConverter;
                     }
                 }
-                if (typeData.TypeInfo.IsGenericType && !typeData.TypeInfo.IsGenericTypeDefinition)
+                var jsonConverterAttribute = typeInfo.GetCustomAttribute<JsonConverterAttribute>(true);
+                if (jsonConverterAttribute != null)
                 {
-                    var jsonConverterAttribute = typeData.TypeInfo.GetCustomAttribute<JsonConverterAttribute>();
-                    if (jsonConverterAttribute != null && jsonConverterAttribute.ConverterType.GetTypeInfo().IsGenericTypeDefinition)
+                    var converterType = jsonConverterAttribute.ConverterType;
+                    if (converterType == TypeData<PublicallySerializableConverter>.Type)
                     {
-                        return (JsonConverter)Activator.CreateInstance(jsonConverterAttribute.ConverterType.MakeGenericType(typeData.TypeInfo.GenericTypeArguments), jsonConverterAttribute.ConverterParameters);
+                        return null;
+                    }
+                    if (typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && converterType.GetTypeInfo().IsGenericTypeDefinition)
+                    {
+                        return (JsonConverter)Activator.CreateInstance(jsonConverterAttribute.ConverterType.MakeGenericType(typeInfo.GenericTypeArguments), jsonConverterAttribute.ConverterParameters);
                     }
                 }
                 return base.ResolveContractConverter(objectType);
+            }
+        }
+
+        private sealed class PublicContractResolver : CustomContractResolver
+        {
+            protected override void PopulateShouldSerializeMethod(JsonProperty property, PropertyInfo propertyInfo)
+            {
+                var propertyName = propertyInfo.Name;
+                var backingFieldName = $"_{char.ToLower(propertyName[0])}{propertyName.Substring(1)}";
+                var backingField = propertyInfo.DeclaringType.GetTypeInfo().DeclaredFields.FirstOrDefault(f => f.Name == backingFieldName);
+                if (backingField != null)
+                {
+                    var backingFieldValueProvider = base.CreateMemberValueProvider(backingField);
+                    property.ShouldSerialize = o => backingFieldValueProvider.GetValue(o) != null;
+                }
+            }
+
+            private static Type s_openStringEnumValueType = typeof(StringEnumValue<>);
+
+            protected override IValueProvider CreateMemberValueProvider(MemberInfo member)
+            {
+                var valueProvider = base.CreateMemberValueProvider(member);
+                if (member is PropertyInfo propertyInfo)
+                {
+                    var propertyTypeInfo = propertyInfo.PropertyType.GetTypeInfo();
+                    if (propertyTypeInfo.IsGenericType && !propertyTypeInfo.IsGenericTypeDefinition && propertyTypeInfo.GetGenericTypeDefinition() == s_openStringEnumValueType)
+                    {
+                        valueProvider = new StringEnumValueProvider(valueProvider);
+                    }
+                }
+                return valueProvider;
+            }
+
+            // Required for proper Public Serialization
+            private class StringEnumValueProvider : IValueProvider
+            {
+                private readonly IValueProvider _valueProvider;
+
+                public StringEnumValueProvider(IValueProvider valueProvider)
+                {
+                    _valueProvider = valueProvider;
+                }
+
+                public object GetValue(object target) => _valueProvider.GetValue(target).ToString();
+
+                public void SetValue(object target, object value) => _valueProvider.SetValue(target, value);
+            }
+        }
+
+        private sealed class PrivateContractResolver : CustomContractResolver
+        {
+            protected override JsonObjectContract CreateObjectContract(Type objectType)
+            {
+                var contract = base.CreateObjectContract(objectType);
+                var objectTypeInfo = objectType.GetTypeInfo();
+                if (TypeData<ExtensibleObject>.TypeInfo.IsAssignableFrom(objectTypeInfo))
+                {
+                    contract.ExtensionDataGetter = o => ((DirtyDictionary<string, object>)(((ExtensibleObject)o).ExtensionData)).GetDirtyItems().Select(p => new KeyValuePair<object, object>(p.Key, p.Value));
+                    contract.ExtensionDataSetter = (o, k, v) => ((ExtensibleObject)o).ExtensionData[k] = v;
+                    var idProperty = GetIdProperty(objectTypeInfo);
+                    var idPropertyNameAttribute = idProperty.GetCustomAttribute<IdPropertyNameAttribute>(false);
+                    var idPropertyName = idPropertyNameAttribute != null ? CamelCaseNamingStrategy.GetPropertyName(idPropertyNameAttribute.IdPropertyName, false) : "id";
+                    var property = contract.Properties.GetClosestMatchProperty(idPropertyName);
+                    if (property != null)
+                    {
+                        property.ShouldSerialize = o => ((IIdentifiable)o).Id != null;
+                    }
+                }
+                return contract;
+            }
+
+            private static PropertyInfo GetIdProperty(TypeInfo typeInfo) => typeInfo.DeclaredProperties.FirstOrDefault(p => p.Name == "EncompassRest.IIdentifiable.Id") ?? typeInfo.DeclaredProperties.FirstOrDefault(p => p.Name == "Id") ?? GetIdProperty(typeInfo.BaseType.GetTypeInfo());
+
+            protected override void PopulateShouldSerializeMethod(JsonProperty property, PropertyInfo propertyInfo)
+            {
+                var propertyName = propertyInfo.Name;
+                var backingFieldName = $"_{char.ToLower(propertyName[0])}{propertyName.Substring(1)}";
+                var backingField = propertyInfo.DeclaringType.GetTypeInfo().DeclaredFields.FirstOrDefault(f => f.Name == backingFieldName && f.FieldType.GetTypeInfo().ImplementedInterfaces.Contains(TypeData<IDirty>.Type));
+                if (backingField != null)
+                {
+                    var backingFieldValueProvider = CreateMemberValueProvider(backingField);
+                    property.ShouldSerialize = o => ((IDirty)backingFieldValueProvider.GetValue(o))?.Dirty == true;
+                }
+                else if (propertyInfo.PropertyType.GetTypeInfo().ImplementedInterfaces.Contains(TypeData<IDirty>.Type))
+                {
+                    property.ShouldSerialize = o => ((IDirty)property.ValueProvider.GetValue(o))?.Dirty == true;
+                }
             }
         }
     }

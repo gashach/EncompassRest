@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EncompassRest.Filters;
 using EncompassRest.LoanPipeline;
+using EncompassRest.Schema;
 using EncompassRest.Utilities;
+using EnumsNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EncompassRest.Tests
@@ -12,9 +15,63 @@ namespace EncompassRest.Tests
     public class PipelineTests : TestBaseClass
     {
         [TestMethod]
+        public async Task Pipeline_GetCanonicalNames()
+        {
+            var client = await GetTestClientAsync();
+            var canonicalNames = await client.Pipeline.GetCanonicalNamesAsync();
+
+            var categories = new HashSet<string>(canonicalNames.PipelineLoanReportFieldDefs.Select(p => p.Category.Value));
+            categories.Remove(null);
+            var existingCategories = new HashSet<string>(Enums.GetMembers<PipelineFieldDefinitionCategory>().Select((EnumMember<PipelineFieldDefinitionCategory> m) => m.AsString(EnumFormat.EnumMemberValue, EnumFormat.Name)));
+            var newCategories = categories.Except(existingCategories).ToList();
+            Assert.AreEqual(0, newCategories.Count);
+
+            var fieldFormats = new HashSet<LoanFieldFormat>(canonicalNames.PipelineLoanReportFieldDefs.Select(p => p.FieldDefinition.Format));
+            var existingFieldFormats = new HashSet<LoanFieldFormat>(Enums.GetValues<LoanFieldFormat>());
+            var newFieldFormats = fieldFormats.Except(existingFieldFormats).ToList();
+            Assert.AreEqual(0, newFieldFormats.Count);
+
+            var canonicalFieldNames = new HashSet<string>(canonicalNames.PipelineLoanReportFieldDefs.Select(p => p.CriterionFieldName).Where(n => n?.StartsWith("Loan.") == true));
+            var existingCanonicalFieldNames = new HashSet<string>(Enums.GetValues<CanonicalLoanField>().Select(v => v.GetCanonicalName()));
+            var newCanonicalFieldNames = canonicalFieldNames.Except(existingCanonicalFieldNames, StringComparer.OrdinalIgnoreCase).ToList();
+            Assert.AreEqual(0, newCanonicalFieldNames.Count);
+
+            Assert.AreEqual(0, canonicalNames.ExtensionData.Count);
+
+            foreach (var pipelineFieldDef in canonicalNames.PipelineLoanReportFieldDefs)
+            {
+                Assert.AreEqual(0, pipelineFieldDef.ExtensionData.Count);
+                
+                ValidateNoExtensionData(pipelineFieldDef.FieldDefinition);
+            }
+        }
+
+        private void ValidateNoExtensionData(FieldDefinition fieldDefinition)
+        {
+            Assert.AreEqual(0, fieldDefinition.ExtensionData.Count);
+
+            var fieldOptions = fieldDefinition.FieldOptions;
+            if (fieldOptions != null)
+            {
+                Assert.AreEqual(0, fieldOptions.ExtensionData.Count);
+
+                foreach (var option in fieldOptions.Options)
+                {
+                    Assert.AreEqual(0, option.ExtensionData.Count);
+                }
+            }
+
+            var parentField = fieldDefinition.ParentField;
+            if (parentField != null)
+            {
+                ValidateNoExtensionData(parentField);
+            }
+        }
+
+        [TestMethod]
         public void ViewPipelineParameters_Serialization()
         {
-            var parameters = new PipelineParameters(new StringFieldFilter(CanonicalField.LoanFolder, StringFieldMatchType.Exact, "Active Loans"), new[] { "Fields.364", "Fields.4002" }, new[] { new FieldSort("Fields.4002", SortOrder.Ascending) });
+            var parameters = new PipelineParameters(new StringFieldFilter(CanonicalLoanField.LoanFolder, StringFieldMatchType.Exact, "Active Loans"), new[] { "Fields.364", "Fields.4002" }, new[] { new FieldSort("Fields.4002", SortOrder.Ascending) });
             Assert.AreEqual(@"{""filter"":{""matchType"":""exact"",""value"":""Active Loans"",""canonicalName"":""Loan.LoanFolder""},""fields"":[""Fields.364"",""Fields.4002""],""sortOrder"":[{""canonicalName"":""Fields.4002"",""order"":""asc""}]}", parameters.ToJson());
         }
 
@@ -22,13 +79,12 @@ namespace EncompassRest.Tests
         public async Task Pipeline_ViewPipeline()
         {
             var client = await GetTestClientAsync();
-            var pipelineData = await client.Pipeline.ViewPipelineAsync(new PipelineParameters(new NumericFieldFilter(CanonicalField.LoanAmount, OrdinalFieldMatchType.GreaterThanOrEquals, 0M)));
+            var pipelineData = await client.Pipeline.ViewPipelineAsync(new PipelineParameters(new NumericFieldFilter(CanonicalLoanField.LoanAmount, OrdinalFieldMatchType.GreaterThanOrEquals, 0M)));
             Assert.IsNotNull(pipelineData);
             Assert.IsTrue(pipelineData.Count > 0);
             foreach (var item in pipelineData)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(item.LoanGuid));
-                Assert.IsNull(item.Fields);
+                ValidateItem(item, null);
             }
         }
 
@@ -36,7 +92,7 @@ namespace EncompassRest.Tests
         public async Task Pipeline_CreateCursor_ReturnsNullForNoResults()
         {
             var client = await GetTestClientAsync();
-            var cursor = await client.Pipeline.CreateCursorAsync(new PipelineParameters(new NumericFieldFilter(CanonicalField.LoanAmount, OrdinalFieldMatchType.LessThan, 0M)));
+            var cursor = await client.Pipeline.CreateCursorAsync(new PipelineParameters(new NumericFieldFilter(CanonicalLoanField.LoanAmount, OrdinalFieldMatchType.LessThan, 0M)));
             Assert.IsNull(cursor);
         }
 
@@ -44,7 +100,7 @@ namespace EncompassRest.Tests
         public async Task Pipeline_Cursor_GetItem()
         {
             var client = await GetTestClientAsync();
-            var cursor = await client.Pipeline.CreateCursorAsync(new PipelineParameters(new NumericFieldFilter(CanonicalField.LoanAmount, OrdinalFieldMatchType.GreaterThanOrEquals, 0M)));
+            var cursor = await client.Pipeline.CreateCursorAsync(new PipelineParameters(new NumericFieldFilter(CanonicalLoanField.LoanAmount, OrdinalFieldMatchType.GreaterThanOrEquals, 0M)));
             Assert.IsNotNull(cursor);
             CollectionAssert.AreEqual(new string[0], cursor.Fields.ToList());
             Assert.IsFalse(string.IsNullOrEmpty(cursor.CursorId));
@@ -52,8 +108,7 @@ namespace EncompassRest.Tests
             for (var i = 0; i < Math.Min(cursor.Count, 50); ++i)
             {
                 var item = await cursor.GetItemAsync(i);
-                Assert.IsFalse(string.IsNullOrEmpty(item.LoanGuid));
-                Assert.IsNull(item.Fields);
+                ValidateItem(item, null);
             }
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => cursor.GetItemAsync(-1));
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => cursor.GetItemAsync(cursor.Count));
@@ -64,7 +119,7 @@ namespace EncompassRest.Tests
         {
             var client = await GetTestClientAsync();
             var fields = new[] { "Fields.364", "Fields.4002" };
-            var cursor = await client.Pipeline.CreateCursorAsync(new PipelineParameters(new NumericFieldFilter(CanonicalField.LoanAmount, OrdinalFieldMatchType.GreaterThanOrEquals, 0M), fields));
+            var cursor = await client.Pipeline.CreateCursorAsync(new PipelineParameters(new NumericFieldFilter(CanonicalLoanField.LoanAmount, OrdinalFieldMatchType.GreaterThanOrEquals, 0M), fields));
             Assert.IsNotNull(cursor);
             CollectionAssert.AreEqual(fields, cursor.Fields.ToList());
             Assert.IsFalse(string.IsNullOrEmpty(cursor.CursorId));
@@ -72,16 +127,34 @@ namespace EncompassRest.Tests
             var items = await cursor.GetItemsAsync(0, Math.Min(cursor.Count, 50));
             foreach (var item in items)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(item.LoanGuid));
-                Assert.IsNotNull(item.Fields);
-                Assert.AreEqual(2, item.Fields.Count);
-                Assert.IsTrue(item.Fields.ContainsKey(fields[0]));
-                Assert.IsTrue(item.Fields.ContainsKey(fields[1]));
+                ValidateItem(item, fields);
             }
-            Assert.AreEqual(Math.Min(cursor.Count, 50), items.Count());
+            Assert.IsTrue(items.Count() <= 50);
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => cursor.GetItemsAsync(-1, 1));
             await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => cursor.GetItemsAsync(cursor.Count, 1));
-            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => cursor.GetItemsAsync(0, cursor.Count + 1));
+            items = await cursor.GetItemsAsync(cursor.Count - 1, 1);
+            ValidateItem(items[0], fields);
+            items = await cursor.GetItemsAsync(cursor.Count - 1, int.MaxValue); // Does not throw ArgumentOutOfRangeException
+            Assert.AreEqual(1, items.Count);
+            ValidateItem(items[0], fields);
+        }
+
+        private void ValidateItem(LoanPipelineData item, string[] fields)
+        {
+            Assert.IsFalse(string.IsNullOrEmpty(item.LoanGuid));
+            if (fields?.Length > 0)
+            {
+                Assert.IsNotNull(item.Fields);
+                Assert.AreEqual(fields.Length, item.Fields.Count);
+                foreach (var field in fields)
+                {
+                    Assert.IsTrue(item.Fields.ContainsKey(field));
+                }
+            }
+            else
+            {
+                Assert.IsNull(item.Fields);
+            }
         }
     }
 }

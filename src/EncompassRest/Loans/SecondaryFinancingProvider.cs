@@ -1,42 +1,37 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class SecondaryFinancingProvider : IDirty
+    public sealed partial class SecondaryFinancingProvider : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<decimal?> _financingAmount;
-        public decimal? FinancingAmount { get { return _financingAmount; } set { _financingAmount = value; } }
+        public decimal? FinancingAmount { get => _financingAmount; set => _financingAmount = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<string> _secondaryFinancingProviderType;
-        public string SecondaryFinancingProviderType { get { return _secondaryFinancingProviderType; } set { _secondaryFinancingProviderType = value; } }
+        public string SecondaryFinancingProviderType { get => _secondaryFinancingProviderType; set => _secondaryFinancingProviderType = value; }
         private DirtyValue<bool?> _sellerFundedDapIndicator;
-        public bool? SellerFundedDapIndicator { get { return _sellerFundedDapIndicator; } set { _sellerFundedDapIndicator = value; } }
+        public bool? SellerFundedDapIndicator { get => _sellerFundedDapIndicator; set => _sellerFundedDapIndicator = value; }
         private DirtyValue<string> _source;
-        public string Source { get { return _source; } set { _source = value; } }
+        public string Source { get => _source; set => _source = value; }
         private DirtyValue<bool?> _sourceFromFamilyIndicator;
-        public bool? SourceFromFamilyIndicator { get { return _sourceFromFamilyIndicator; } set { _sourceFromFamilyIndicator = value; } }
+        public bool? SourceFromFamilyIndicator { get => _sourceFromFamilyIndicator; set => _sourceFromFamilyIndicator = value; }
         private DirtyValue<bool?> _sourceFromGovernmentIndicator;
-        public bool? SourceFromGovernmentIndicator { get { return _sourceFromGovernmentIndicator; } set { _sourceFromGovernmentIndicator = value; } }
+        public bool? SourceFromGovernmentIndicator { get => _sourceFromGovernmentIndicator; set => _sourceFromGovernmentIndicator = value; }
         private DirtyValue<bool?> _sourceFromNPIndicator;
-        public bool? SourceFromNPIndicator { get { return _sourceFromNPIndicator; } set { _sourceFromNPIndicator = value; } }
+        public bool? SourceFromNPIndicator { get => _sourceFromNPIndicator; set => _sourceFromNPIndicator = value; }
         private DirtyValue<bool?> _sourceFromOtherIndicator;
-        public bool? SourceFromOtherIndicator { get { return _sourceFromOtherIndicator; } set { _sourceFromOtherIndicator = value; } }
+        public bool? SourceFromOtherIndicator { get => _sourceFromOtherIndicator; set => _sourceFromOtherIndicator = value; }
         private DirtyValue<string> _sourceOtherDetail;
-        public string SourceOtherDetail { get { return _sourceOtherDetail; } set { _sourceOtherDetail = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string SourceOtherDetail { get => _sourceOtherDetail; set => _sourceOtherDetail = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _financingAmount.Dirty
+                return _financingAmount.Dirty
                     || _id.Dirty
                     || _secondaryFinancingProviderType.Dirty
                     || _sellerFundedDapIndicator.Dirty
@@ -46,13 +41,9 @@ namespace EncompassRest.Loans
                     || _sourceFromNPIndicator.Dirty
                     || _sourceFromOtherIndicator.Dirty
                     || _sourceOtherDetail.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _financingAmount.Dirty = value;
                 _id.Dirty = value;
                 _secondaryFinancingProviderType.Dirty = value;
@@ -63,9 +54,7 @@ namespace EncompassRest.Loans
                 _sourceFromNPIndicator.Dirty = value;
                 _sourceFromOtherIndicator.Dirty = value;
                 _sourceOtherDetail.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }

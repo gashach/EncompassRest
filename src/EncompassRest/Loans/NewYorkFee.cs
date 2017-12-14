@@ -1,44 +1,39 @@
+#pragma warning disable 1591
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
-using Newtonsoft.Json;
+using EncompassRest.Loans.Enums;
 
 namespace EncompassRest.Loans
 {
-    public sealed partial class NewYorkFee : IDirty
+    public sealed partial class NewYorkFee : ExtensibleObject, IIdentifiable
     {
         private DirtyValue<string> _address;
-        public string Address { get { return _address; } set { _address = value; } }
+        public string Address { get => _address; set => _address = value; }
         private DirtyValue<decimal?> _amount;
-        public decimal? Amount { get { return _amount; } set { _amount = value; } }
+        public decimal? Amount { get => _amount; set => _amount = value; }
         private DirtyValue<string> _city;
-        public string City { get { return _city; } set { _city = value; } }
+        public string City { get => _city; set => _city = value; }
         private DirtyValue<string> _comments;
-        public string Comments { get { return _comments; } set { _comments = value; } }
+        public string Comments { get => _comments; set => _comments = value; }
         private DirtyValue<DateTime?> _date;
-        public DateTime? Date { get { return _date; } set { _date = value; } }
+        public DateTime? Date { get => _date; set => _date = value; }
         private DirtyValue<string> _feeType;
-        public string FeeType { get { return _feeType; } set { _feeType = value; } }
+        public string FeeType { get => _feeType; set => _feeType = value; }
         private DirtyValue<string> _id;
-        public string Id { get { return _id; } set { _id = value; } }
+        public string Id { get => _id; set => _id = value; }
         private DirtyValue<string> _name;
-        public string Name { get { return _name; } set { _name = value; } }
+        public string Name { get => _name; set => _name = value; }
         private DirtyValue<int?> _newYorkFeeIndex;
-        public int? NewYorkFeeIndex { get { return _newYorkFeeIndex; } set { _newYorkFeeIndex = value; } }
+        public int? NewYorkFeeIndex { get => _newYorkFeeIndex; set => _newYorkFeeIndex = value; }
         private DirtyValue<string> _postalCode;
-        public string PostalCode { get { return _postalCode; } set { _postalCode = value; } }
+        public string PostalCode { get => _postalCode; set => _postalCode = value; }
         private DirtyValue<string> _state;
-        public string State { get { return _state; } set { _state = value; } }
-        private bool _gettingDirty;
-        private bool _settingDirty; 
-        internal bool Dirty
+        public string State { get => _state; set => _state = value; }
+        internal override bool DirtyInternal
         {
             get
             {
-                if (_gettingDirty) return false;
-                _gettingDirty = true;
-                var dirty = _address.Dirty
+                return _address.Dirty
                     || _amount.Dirty
                     || _city.Dirty
                     || _comments.Dirty
@@ -49,13 +44,9 @@ namespace EncompassRest.Loans
                     || _newYorkFeeIndex.Dirty
                     || _postalCode.Dirty
                     || _state.Dirty;
-                _gettingDirty = false;
-                return dirty;
             }
             set
             {
-                if (_settingDirty) return;
-                _settingDirty = true;
                 _address.Dirty = value;
                 _amount.Dirty = value;
                 _city.Dirty = value;
@@ -67,9 +58,7 @@ namespace EncompassRest.Loans
                 _newYorkFeeIndex.Dirty = value;
                 _postalCode.Dirty = value;
                 _state.Dirty = value;
-                _settingDirty = false;
             }
         }
-        bool IDirty.Dirty { get { return Dirty; } set { Dirty = value; } }
     }
 }
