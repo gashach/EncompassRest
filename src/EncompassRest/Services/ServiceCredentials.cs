@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EncompassRest.Services
 {
-    public sealed class Credentials : ExtensibleObject
+    public sealed class ServiceCredentials : ExtensibleObject
     {
         public string UserName { get; set; }
         public string Password { get; set; }
