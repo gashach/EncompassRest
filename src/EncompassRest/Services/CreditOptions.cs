@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EncompassRest.Services
 {
-    public sealed class Options
+    public sealed class CreditOptions : ExtensibleObject
     {
         public bool DigiCert { get; set; }
         public string RequestType { get; set; }
