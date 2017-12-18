@@ -1,8 +1,9 @@
 ﻿namespace EncompassRest.Services
 {
-    public sealed class VerificationProduct : ServiceProduct<ServiceOptions>
+    public sealed class VerificationProduct<TServiceOptions> : ServiceProduct<TServiceOptions>
+        where TServiceOptions : ServiceOptions
     {
         public string BranchId { get; set; }
-        public override ServiceOptions Options { get; }
+        public override TServiceOptions Options { get; }
     }
 }

@@ -1,13 +1,20 @@
-﻿namespace EncompassRest.Services
+﻿using System;
+using System.Threading.Tasks;
+
+namespace EncompassRest.Services
 {
-    public abstract class Services<TService> : ApiObject
-        where TService : Service
+    public abstract class Services<TProduct, TOptions> : ApiObject
+        where TProduct : ServiceProduct<TOptions>
+        where TOptions : ServiceOptions
     {
         internal Services(EncompassRestClient client) 
            : base(client, "services/v1")
         {
         }
 
-        public Task<ServiceProduct>
+        public Task<string> OrderServiceAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
