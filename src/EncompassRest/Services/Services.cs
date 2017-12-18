@@ -3,13 +3,17 @@ using System.Threading.Tasks;
 
 namespace EncompassRest.Services
 {
-    public abstract class Services<TProduct, TOptions> : ApiObject
-        where TProduct : ServiceProduct<TOptions>
-        where TOptions : ServiceOptions
+    public abstract class Services<TService,TServiceOptions,TServiceProduct> : ApiObject
+        where TService : Service<TServiceProduct,TServiceOptions>
+        where TServiceProduct : ServiceProduct<TServiceOptions>
+        where TServiceOptions : ServiceOptions
     {
-        internal Services(EncompassRestClient client) 
+        private TService _service;
+
+        internal Services(EncompassRestClient client, TService service) 
            : base(client, "services/v1")
         {
+            _service = service;
         }
 
         public Task<string> OrderServiceAsync()
