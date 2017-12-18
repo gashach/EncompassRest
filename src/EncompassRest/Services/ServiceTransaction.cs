@@ -9,7 +9,6 @@ namespace EncompassRest.Services
         public string Status { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
-        public TransactionAttachment Attachments { get; set; }
-
+        public List<TransactionAttachment> Attachments { get; set; }
     }
 }

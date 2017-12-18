@@ -4,9 +4,9 @@ using System.Text;
 
 namespace EncompassRest.Services
 {
-    public sealed class EV4506T : ServiceProduct<EV4506TOptions>
+    public sealed class VerificationProduct : ServiceProduct<ServiceOptions>
     {
         public string BranchId { get; set; }
-        public override EV4506TOptions Options { get; }
+        public override ServiceOptions Options { get; }
     }
 }
