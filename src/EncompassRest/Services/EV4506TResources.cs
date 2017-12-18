@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EncompassRest.Services
+﻿namespace EncompassRest.Services
 {
     public sealed class EV4506TResources : ExtensibleObject
     {

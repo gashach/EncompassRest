@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EncompassRest.Services
+﻿namespace EncompassRest.Services
 {
     public abstract class Service
     {
